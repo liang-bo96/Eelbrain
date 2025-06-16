@@ -618,6 +618,64 @@ class EelbrainPlotly2DViz:
         print(f"Open http://127.0.0.1:{port}/ in your browser\n")
         
         self.app.run(debug=debug, port=port)
+    
+    def export_images(self, output_dir="./images", time_idx=None, format="png"):
+        """Export current plots as image files.
+        
+        Parameters
+        ----------
+        output_dir : str, optional
+            Directory to save image files. Default is "./images".
+        time_idx : int, optional
+            Time index to export. If None, uses 0.
+        format : str, optional
+            Image format ('png', 'jpg', 'svg', 'pdf'). Default is 'png'.
+            
+        Returns
+        -------
+        dict
+            Dictionary with exported file paths and status.
+        """
+        import os
+        from datetime import datetime
+        
+        # Create output directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Use provided time_idx or default to 0
+        if time_idx is None:
+            time_idx = 0
+        
+        # Timestamp for unique filenames
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        exported_files = {}
+        
+        try:
+            # Export butterfly plot
+            butterfly_fig = self.create_butterfly_plot(time_idx)
+            butterfly_path = os.path.join(output_dir, f"butterfly_plot_{timestamp}.{format}")
+            butterfly_fig.write_image(butterfly_path, width=1200, height=600)
+            exported_files['butterfly_plot'] = butterfly_path
+            
+            # Export brain projections
+            brain_plots = self.create_2d_brain_projections_plotly(time_idx)
+            
+            for view_name, fig in brain_plots.items():
+                brain_path = os.path.join(output_dir, f"{view_name}_view_{timestamp}.{format}")
+                fig.write_image(brain_path, width=800, height=600)
+                exported_files[f'{view_name}_view'] = brain_path
+            
+            print(f"✓ Successfully exported {len(exported_files)} image files to {output_dir}")
+            for file_type, path in exported_files.items():
+                print(f"  - {file_type}: {path}")
+                
+            return {"status": "success", "files": exported_files}
+            
+        except Exception as e:
+            error_msg = f"Image export failed: {str(e)}"
+            print(f"✗ {error_msg}")
+            return {"status": "error", "message": error_msg, "files": exported_files}
 
 
 # Run the app when script is executed directly
@@ -646,6 +704,18 @@ if __name__ == '__main__':
             show_max_only=False  # Set to True for cleaner butterfly plot with only mean & max
         )
         
+        # Export images for a specific time point
+        result = viz_2d.export_images(
+            output_dir="./brain_images",
+            time_idx=10,
+            format="png"
+        )
+
+        # Check if export was successful
+        if result["status"] == "success":
+            print("Images saved:", result["files"])
+        
+        # Run the interactive app
         viz_2d.run()
         
     except Exception as e:
