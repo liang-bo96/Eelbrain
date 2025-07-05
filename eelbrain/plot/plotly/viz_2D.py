@@ -1,11 +1,13 @@
+import base64
+import io
+import random
+
 import dash
 from dash import dcc, html, Input, Output, State
-import plotly.graph_objects as go
-import numpy as np
-import random
-import io
-import base64
 import matplotlib.pyplot as plt
+import numpy as np
+import plotly.graph_objects as go
+
 from eelbrain import set_parc
 
 
