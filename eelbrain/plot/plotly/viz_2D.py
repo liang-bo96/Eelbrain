@@ -19,7 +19,7 @@ class EelbrainPlotly2DViz:
     # let user to control data showing
     #  data_source_location data format
 
-    def __init__(self, y=None, data_source_location=None, region=None, colorscale='Hot', show_max_only=False):
+    def __init__(self, y=None, data_source_location=None, region=None, cmap='Hot', show_max_only=False):
         """Initialize the visualization app and load data.
 
         Parameters
@@ -35,7 +35,7 @@ class EelbrainPlotly2DViz:
         region : str, optional
             Brain region to load using aparc+aseg parcellation.
             If None, loads all regions. Only used when loading from file.
-        colorscale : str or list, optional
+        cmap : str or list, optional
             Plotly colorscale for heatmaps. Can be:
             - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
             - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
@@ -53,7 +53,7 @@ class EelbrainPlotly2DViz:
         self.source_coords = None     # (n_sources, 3)
         self.time_values = None       # (n_times,)
         self.region_of_brain = region  # Region of brain to visualize
-        self.colorscale = colorscale  # Colorscale for heatmaps
+        self.cmap = cmap  # Colorscale for heatmaps
         self.show_max_only = show_max_only  # Control butterfly plot display mode
 
         # Load data
@@ -537,7 +537,7 @@ class EelbrainPlotly2DViz:
                 x=x_centers,
                 y=y_centers,
                 z=H_display.T,  # Transpose to match Plotly orientation
-                colorscale=self.colorscale,
+                colorscale=self.cmap,
                 colorbar=dict(title="Activity Magnitude"),
                 showscale=True,
                 hovertemplate=f'{xlabel}: %{{x:.3f}}<br>{ylabel}: %{{y:.3f}}<br>Activity: %{{z:.2e}}<extra></extra>'
@@ -735,13 +735,13 @@ class EelbrainPlotly2DViz:
 # Run the app when script is executed directly
 if __name__ == '__main__':
     try:
-        # Example colorscale options:
-        # colorscale = 'Hot'           # Black → Red → Yellow → White
-        # colorscale = 'YlOrRd'        # Yellow → Orange → Red
-        # colorscale = 'Viridis'       # Purple → Blue → Green → Yellow
+        # Example cmap options:
+        # cmap = 'Hot'           # Black → Red → Yellow → White
+        # cmap = 'YlOrRd'        # Yellow → Orange → Red
+        # cmap = 'Viridis'       # Purple → Blue → Green → Yellow
 
-        # Custom colorscale example
-        colorscale = [
+        # Custom cmap example
+        cmap = [
             [0, 'rgba(255,255,0,0.5)'],    # Yellow with 50% transparency
             [0.5, 'rgba(255,165,0,0.8)'],  # Orange with 80% transparency
             [1, 'rgba(255,0,0,1.0)']       # Red with full opacity
@@ -761,14 +761,14 @@ if __name__ == '__main__':
         # # Create visualization with direct data
         # viz_2d = EelbrainPlotly2DViz(
         #     y=y,  # Pass NDVar directly
-        #     colorscale=colorscale,
+        #     cmap=cmap,
         #     show_max_only=False
         # )
 
         # Method 2: Use the original approach with data_source_location and region
         viz_2d = EelbrainPlotly2DViz(
             region='aparc+aseg',
-            colorscale=colorscale,
+            cmap=cmap,
             show_max_only=False
         )
 
