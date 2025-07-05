@@ -13,6 +13,11 @@ from eelbrain import set_parc
 
 class EelbrainPlotly2DViz:
     """Interactive 2D brain visualization for brain data using Plotly and Dash."""
+    # typing
+    # show arrows larger than 10 import plotly wen user call function
+    # add test 
+    # let user to control data showing
+    #  data_source_location data format
 
     def __init__(self, y=None, data_source_location=None, region=None, colorscale='Hot', show_max_only=False):
         """Initialize the visualization app and load data.
@@ -90,8 +95,8 @@ class EelbrainPlotly2DViz:
         # Average over trials/cases
         src_ndvar = data_ds['src'].mean('case')
 
-        # Extract coordinates and data
-        self.glass_brain_data = src_ndvar.x  # (n_sources, 3, n_times)
+        # Extract coordinates and data 
+        self.glass_brain_data = src_ndvar.get_data(('source','space', 'time'))  # (n_sources, 3, n_times) todo modify the order of data to be (n_sources, n_times, 3)
         self.source_coords = src_ndvar.source.coordinates  # (n_sources, 3)
         self.time_values = src_ndvar.time.times
 
