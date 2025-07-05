@@ -22,16 +22,16 @@ class EelbrainPlotly2DViz:
     """Interactive 2D brain visualization for brain data using Plotly and Dash."""
     # typing
     # show arrows larger than 10 import plotly wen user call function
-    # add test 
+    # add test
     # let user to control data showing
     #  data_source_location data format
 
     def __init__(
-            self, 
-            y: Optional[NDVar] = None, 
-            data_source_location: Optional[str] = None, 
-            region: Optional[str] = None, 
-            cmap: Union[str, List] = 'Hot', 
+            self,
+            y: Optional[NDVar] = None,
+            data_source_location: Optional[str] = None,
+            region: Optional[str] = None,
+            cmap: Union[str, List] = 'Hot',
             show_max_only: bool = False
     ):
         """Initialize the visualization app and load data.
@@ -109,8 +109,8 @@ class EelbrainPlotly2DViz:
         # Average over trials/cases
         src_ndvar = data_ds['src'].mean('case')
 
-        # Extract coordinates and data 
-        self.glass_brain_data = src_ndvar.get_data(('source','space', 'time'))  # (n_sources, 3, n_times) todo modify the order of data to be (n_sources, n_times, 3)
+        # Extract coordinates and data
+        self.glass_brain_data = src_ndvar.get_data(('source', 'space', 'time'))  # (n_sources, 3, n_times) todo modify the order of data to be (n_sources, n_times, 3)
         self.source_coords = src_ndvar.source.coordinates  # (n_sources, 3)
         self.time_values = src_ndvar.time.times
 
@@ -134,12 +134,12 @@ class EelbrainPlotly2DViz:
         """
         if y.has_case:
             y = y.mean('case')
-        
+
         # Extract source dimension info
         source = y.get_dim('source')
         self.source_coords = source.coordinates
         self.time_values = y.time.times
-        
+
         # Store source space info
         self.source_space = source
         if hasattr(self.source_space, 'parc'):
