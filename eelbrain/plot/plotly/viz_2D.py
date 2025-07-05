@@ -14,16 +14,22 @@ from eelbrain import set_parc
 class EelbrainPlotly2DViz:
     """Interactive 2D brain visualization for brain data using Plotly and Dash."""
 
-    def __init__(self, data_source_location=None, region=None, colorscale='Hot', show_max_only=False):
+    def __init__(self, y=None, data_source_location=None, region=None, colorscale='Hot', show_max_only=False):
         """Initialize the visualization app and load data.
 
         Parameters
         ----------
+        y : NDVar, optional
+            Data to plot ([case,] time, source[, space]).
+            If ``y`` has a case dimension, the mean is plotted.
+            If ``y`` has a space dimension, the norm is plotted.
+            If None, uses MNE sample data.
         data_source_location : str, optional
-            Path to the data file. If None, uses MNE sample data.
+            Path to the data file. If None and y is None, uses MNE sample data.
+            Ignored if y is provided.
         region : str, optional
             Brain region to load using aparc+aseg parcellation.
-            If None, loads all regions.
+            If None, loads all regions. Only used when loading from file.
         colorscale : str or list, optional
             Plotly colorscale for heatmaps. Can be:
             - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
@@ -46,7 +52,10 @@ class EelbrainPlotly2DViz:
         self.show_max_only = show_max_only  # Control butterfly plot display mode
 
         # Load data
-        self._load_source_data(data_source_location, region)
+        if y is not None:
+            self._load_ndvar_data(y)
+        else:
+            self._load_source_data(data_source_location, region)
 
         # Setup app
         self._setup_layout()
@@ -95,6 +104,44 @@ class EelbrainPlotly2DViz:
 
         # Compute norm for butterfly plot
         self.butterfly_data = np.linalg.norm(self.glass_brain_data, axis=1)
+
+    def _load_ndvar_data(self, y):
+        """Load data from NDVar directly.
+
+        Parameters
+        ----------
+        y : NDVar
+            Data with dimensions ([case,] time, source[, space]).
+        """
+        if y.has_case:
+            y = y.mean('case')
+        
+        # Extract source dimension info
+        source = y.get_dim('source')
+        self.source_coords = source.coordinates
+        self.time_values = y.time.times
+        
+        # Store source space info
+        self.source_space = source
+        if hasattr(self.source_space, 'parc'):
+            self.parcellation = self.source_space.parc
+            self.region_of_brain = str(self.parcellation)
+        else:
+            self.parcellation = None
+            self.region_of_brain = 'Full Brain'
+
+        # Handle space dimension (vector data)
+        if y.has_dim('space'):
+            # Extract 3D vector data
+            self.glass_brain_data = y.get_data(('source', 'space', 'time'))  # (n_sources, 3, n_times)
+            # Compute norm for butterfly plot
+            self.butterfly_data = np.linalg.norm(self.glass_brain_data, axis=1)
+        else:
+            # Scalar data - no space dimension
+            self.glass_brain_data = y.get_data(('source', 'time'))  # (n_sources, n_times)
+            self.butterfly_data = self.glass_brain_data.copy()
+            # Expand to 3D for consistency (assuming scalar represents magnitude)
+            self.glass_brain_data = self.glass_brain_data[:, np.newaxis, :]  # (n_sources, 1, n_times)
 
     def _setup_layout(self):
         """Setup the Dash app layout."""
@@ -699,11 +746,25 @@ if __name__ == '__main__':
         # show_max_only=False: Shows individual source traces + mean + max (default)
         # show_max_only=True:  Shows only mean + max traces (cleaner view)
 
-        # Create and run the visualization
+        # Method 1: Pass data directly using y parameter (similar to plot.GlassBrain.butterfly)
+        # from eelbrain import datasets
+        #
+        # # Load data
+        # data_ds = datasets.get_mne_sample(src='vol', ori='vector')
+        # y = data_ds['src']  # NDVar with dimensions (case, time, source, space)
+        #
+        # # Create visualization with direct data
+        # viz_2d = EelbrainPlotly2DViz(
+        #     y=y,  # Pass NDVar directly
+        #     colorscale=colorscale,
+        #     show_max_only=False
+        # )
+
+        # Method 2: Use the original approach with data_source_location and region
         viz_2d = EelbrainPlotly2DViz(
             region='aparc+aseg',
             colorscale=colorscale,
-            show_max_only=False  # Set to True for cleaner butterfly plot with only mean & max
+            show_max_only=False
         )
 
         # Example: Export plot images
