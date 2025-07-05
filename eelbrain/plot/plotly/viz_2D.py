@@ -9,6 +9,13 @@ import numpy as np
 import plotly.graph_objects as go
 
 from eelbrain import set_parc
+from typing import Optional, Union, List
+
+# Handle import for both standalone and package usage
+try:
+    from .._data_obj import NDVar
+except ImportError:
+    from eelbrain import NDVar
 
 
 class EelbrainPlotly2DViz:
@@ -19,28 +26,35 @@ class EelbrainPlotly2DViz:
     # let user to control data showing
     #  data_source_location data format
 
-    def __init__(self, y=None, data_source_location=None, region=None, cmap='Hot', show_max_only=False):
+    def __init__(
+            self, 
+            y: Optional[NDVar] = None, 
+            data_source_location: Optional[str] = None, 
+            region: Optional[str] = None, 
+            cmap: Union[str, List] = 'Hot', 
+            show_max_only: bool = False
+    ):
         """Initialize the visualization app and load data.
 
         Parameters
         ----------
-        y : NDVar, optional
+        y
             Data to plot ([case,] time, source[, space]).
             If ``y`` has a case dimension, the mean is plotted.
             If ``y`` has a space dimension, the norm is plotted.
             If None, uses MNE sample data.
-        data_source_location : str, optional
+        data_source_location
             Path to the data file. If None and y is None, uses MNE sample data.
             Ignored if y is provided.
-        region : str, optional
+        region
             Brain region to load using aparc+aseg parcellation.
             If None, loads all regions. Only used when loading from file.
-        cmap : str or list, optional
+        cmap
             Plotly colorscale for heatmaps. Can be:
             - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
             - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
             Default is 'Hot'.
-        show_max_only : bool, optional
+        show_max_only
             If True, butterfly plot shows only mean and max traces.
             If False, butterfly plot shows individual source traces, mean, and max.
             Default is False.
