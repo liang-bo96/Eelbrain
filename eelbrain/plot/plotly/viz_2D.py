@@ -14,11 +14,6 @@ from eelbrain import set_parc, NDVar
 
 class EelbrainPlotly2DViz:
     """Interactive 2D brain visualization for brain data using Plotly and Dash."""
-    # typing
-    # show arrows larger than 10 import plotly wen user call function
-    # add test
-    # let user to control data showing
-    #  data_source_location data format
 
     def __init__(
             self,
@@ -26,7 +21,8 @@ class EelbrainPlotly2DViz:
             data_source_location: Optional[str] = None,
             region: Optional[str] = None,
             cmap: Union[str, List] = 'Hot',
-            show_max_only: bool = False
+            show_max_only: bool = False,
+            arrow_threshold: Optional[Union[float, str]] = None
     ):
         """Initialize the visualization app and load data.
 
@@ -52,6 +48,11 @@ class EelbrainPlotly2DViz:
             If True, butterfly plot shows only mean and max traces.
             If False, butterfly plot shows individual source traces, mean, and max.
             Default is False.
+        arrow_threshold
+            Threshold for displaying arrows in brain projections. Only arrows with
+            magnitude greater than this value will be displayed. If None, all arrows
+            are shown. If 'auto', uses 10% of the maximum magnitude as threshold.
+            Default is None.
         """
         self.app = dash.Dash(__name__)
 
@@ -63,6 +64,7 @@ class EelbrainPlotly2DViz:
         self.region_of_brain = region  # Region of brain to visualize
         self.cmap = cmap  # Colorscale for heatmaps
         self.show_max_only = show_max_only  # Control butterfly plot display mode
+        self.arrow_threshold = arrow_threshold  # Threshold for displaying arrows
 
         # Load data
         if y is not None:
@@ -563,7 +565,27 @@ class EelbrainPlotly2DViz:
                 max_arrows = 50  # Limit number of arrows for performance
                 step = max(1, len(active_coords) // max_arrows)
 
+                # Calculate arrow magnitudes for filtering
+                arrow_magnitudes = np.linalg.norm(active_vectors, axis=1)
+
+                # Determine threshold for showing arrows
+                if self.arrow_threshold is None:
+                    # Show all arrows
+                    show_arrow_mask = np.ones(len(active_vectors), dtype=bool)
+                elif self.arrow_threshold == 'auto':
+                    # Use 10% of maximum magnitude as threshold
+                    threshold_value = 0.1 * np.max(arrow_magnitudes)
+                    show_arrow_mask = arrow_magnitudes > threshold_value
+                else:
+                    # Use specified threshold
+                    threshold_value = float(self.arrow_threshold)
+                    show_arrow_mask = arrow_magnitudes > threshold_value
+
                 for i in range(0, len(active_coords), step):
+                    # Only show arrow if it meets the threshold criteria
+                    if not show_arrow_mask[i]:
+                        continue
+
                     x_start = x_coords[i]
                     y_start = y_coords[i]
                     x_end = x_start + u_vectors[i] * arrow_scale
@@ -601,24 +623,36 @@ class EelbrainPlotly2DViz:
 
                     # Highlight selected source arrow if vectors available
                     if active_vectors is not None:
-                        x_start = x_coords[pos]
-                        y_start = y_coords[pos]
-                        x_end = x_start + u_vectors[pos] * arrow_scale
-                        y_end = y_start + v_vectors[pos] * arrow_scale
+                        # Check if the selected source arrow meets the threshold
+                        selected_arrow_magnitude = np.linalg.norm(active_vectors[pos])
+                        show_selected_arrow = True
 
-                        # Add highlighted arrow for selected source
-                        fig.add_annotation(
-                            x=x_end, y=y_end,
-                            ax=x_start, ay=y_start,
-                            xref='x', yref='y',
-                            axref='x', ayref='y',
-                            showarrow=True,
-                            arrowhead=3,
-                            arrowsize=1.0,
-                            arrowwidth=2,
-                            arrowcolor='cyan',
-                            text=""
-                        )
+                        if self.arrow_threshold is not None:
+                            if self.arrow_threshold == 'auto':
+                                threshold_value = 0.1 * np.max(np.linalg.norm(active_vectors, axis=1))
+                            else:
+                                threshold_value = float(self.arrow_threshold)
+                            show_selected_arrow = selected_arrow_magnitude > threshold_value
+
+                        if show_selected_arrow:
+                            x_start = x_coords[pos]
+                            y_start = y_coords[pos]
+                            x_end = x_start + u_vectors[pos] * arrow_scale
+                            y_end = y_start + v_vectors[pos] * arrow_scale
+
+                            # Add highlighted arrow for selected source
+                            fig.add_annotation(
+                                x=x_end, y=y_end,
+                                ax=x_start, ay=y_start,
+                                xref='x', yref='y',
+                                axref='x', ayref='y',
+                                showarrow=True,
+                                arrowhead=3,
+                                arrowsize=1.0,
+                                arrowwidth=2,
+                                arrowcolor='cyan',
+                                text=""
+                            )
         else:
             # Add annotation if no active sources
             fig.add_annotation(text=f"No active sources for {view_name} view",
@@ -759,6 +793,11 @@ if __name__ == '__main__':
         # show_max_only=False: Shows individual source traces + mean + max (default)
         # show_max_only=True:  Shows only mean + max traces (cleaner view)
 
+        # Arrow threshold options:
+        # arrow_threshold=None: Show all arrows (default)
+        # arrow_threshold='auto': Show arrows with magnitude > 10% of max
+        # arrow_threshold=0.01: Show arrows with magnitude > 0.01 (custom threshold)
+
         # Method 1: Pass data directly using y parameter (similar to plot.GlassBrain.butterfly)
         # from eelbrain import datasets
         #
@@ -766,18 +805,20 @@ if __name__ == '__main__':
         # data_ds = datasets.get_mne_sample(src='vol', ori='vector')
         # y = data_ds['src']  # NDVar with dimensions (case, time, source, space)
         #
-        # # Create visualization with direct data
+        # # Create visualization with direct data and arrow filtering
         # viz_2d = EelbrainPlotly2DViz(
         #     y=y,  # Pass NDVar directly
         #     cmap=cmap,
-        #     show_max_only=False
+        #     show_max_only=False,
+        #     arrow_threshold='auto'  # Only show significant arrows
         # )
 
         # Method 2: Use the original approach with data_source_location and region
         viz_2d = EelbrainPlotly2DViz(
             region='aparc+aseg',
             cmap=cmap,
-            show_max_only=False
+            show_max_only=False,
+            arrow_threshold=1  # Only show arrows with magnitude > 10% of max
         )
 
         # Example: Export plot images
