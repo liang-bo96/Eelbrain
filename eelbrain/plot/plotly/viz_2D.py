@@ -1,6 +1,7 @@
 import base64
 import io
 import random
+from typing import Optional, Union, List
 
 import dash
 from dash import dcc, html, Input, Output, State
@@ -8,14 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 
-from eelbrain import set_parc
-from typing import Optional, Union, List
-
-# Handle import for both standalone and package usage
-try:
-    from .._data_obj import NDVar
-except ImportError:
-    from eelbrain import NDVar
+from eelbrain import set_parc, NDVar
 
 
 class EelbrainPlotly2DViz:
