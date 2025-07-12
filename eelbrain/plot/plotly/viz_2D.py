@@ -1,7 +1,7 @@
 import base64
 import io
 import random
-from typing import Optional, Union, List, Dict, Tuple, Any
+from typing import Optional, Union, List, Dict, Any
 
 import dash
 from dash import dcc, html, Input, Output, State
@@ -14,10 +14,10 @@ from eelbrain import set_parc, NDVar, datasets
 
 class EelbrainPlotly2DViz:
     """Interactive 2D brain visualization for brain data using Plotly and Dash.
-    
+
     Based on :class:`plot.GlassBrain`, provides interactive 2D projections of brain
     volume data with butterfly plot and arrow visualization for vector data.
-    
+
     Parameters
     ----------
     y : NDVar, optional
@@ -25,11 +25,11 @@ class EelbrainPlotly2DViz:
         If ``y`` has a case dimension, the mean is plotted.
         If ``y`` has a space dimension, the norm is plotted.
         If None, uses MNE sample data for demonstration.
-    
+
     Notes
     -----
     Expected input format follows the same pattern as :class:`plot.GlassBrain`:
-    
+
     - For vector data: NDVar with dimensions ([case,] time, source, space)
     - For scalar data: NDVar with dimensions ([case,] time, source)
     - If case dimension present: mean across cases is plotted
@@ -585,9 +585,6 @@ class EelbrainPlotly2DViz:
             # Add vector arrows if we have vector data (not scalar data)
             if has_vector_data:
                 arrow_scale = 0.025  # Scale arrows for visibility - increased for better visibility
-                # Performance limit for arrows
-                max_arrows = 100  # Limit arrows for performance
-                arrow_step = max(1, len(active_coords) // max_arrows)
 
                 # Calculate arrow magnitudes for filtering
                 arrow_magnitudes = np.linalg.norm(active_vectors, axis=1)
@@ -604,7 +601,11 @@ class EelbrainPlotly2DViz:
                     # Use specified threshold
                     threshold_value = float(self.arrow_threshold)
                     show_arrow_mask = arrow_magnitudes > threshold_value
-                
+
+                # Performance limit for arrows
+                max_arrows = 100  # Limit arrows for performance
+                arrow_step = max(1, len(active_coords) // max_arrows)
+
                 for i in range(0, len(active_coords), arrow_step):
                     # Only show arrow if it meets the threshold criteria
                     if not show_arrow_mask[i]:
