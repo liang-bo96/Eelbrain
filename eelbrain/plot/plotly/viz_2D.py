@@ -18,7 +18,6 @@ class EelbrainPlotly2DViz:
     def __init__(
             self,
             y: Optional[NDVar] = None,
-            data_source_location: Optional[str] = None,
             region: Optional[str] = None,
             cmap: Union[str, List] = 'Hot',
             show_max_only: bool = False,
@@ -28,27 +27,24 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        y
+        y : NDVar, optional
             Data to plot ([case,] time, source[, space]).
             If ``y`` has a case dimension, the mean is plotted.
             If ``y`` has a space dimension, the norm is plotted.
-            If None, uses MNE sample data.
-        data_source_location
-            Path to the data file. If None and y is None, uses MNE sample data.
-            Ignored if y is provided.
-        region
+            If None, uses MNE sample data for demonstration.
+        region : str, optional
             Brain region to load using aparc+aseg parcellation.
-            If None, loads all regions. Only used when loading from file.
-        cmap
+            If None, loads all regions. Only used when y is None.
+        cmap : str | list, optional
             Plotly colorscale for heatmaps. Can be:
             - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
             - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
             Default is 'Hot'.
-        show_max_only
+        show_max_only : bool, optional
             If True, butterfly plot shows only mean and max traces.
             If False, butterfly plot shows individual source traces, mean, and max.
             Default is False.
-        arrow_threshold
+        arrow_threshold : float | str, optional
             Threshold for displaying arrows in brain projections. Only arrows with
             magnitude greater than this value will be displayed. If None, all arrows
             are shown. If 'auto', uses 10% of the maximum magnitude as threshold.
@@ -70,19 +66,17 @@ class EelbrainPlotly2DViz:
         if y is not None:
             self._load_ndvar_data(y)
         else:
-            self._load_source_data(data_source_location, region)
+            self._load_source_data(region)
 
         # Setup app
         self._setup_layout()
         self._setup_callbacks()
 
-    def _load_source_data(self, data_source_location=None, region=None):
+    def _load_source_data(self, region=None):
         """Load MNE sample data and prepare for 2D brain visualization.
 
         Parameters
         ----------
-        data_source_location : str, optional
-            Path to the data file. If None, uses MNE sample data.
         region : str, optional
             Brain region to load using aparc+aseg parcellation.
             If None, loads all regions.
@@ -90,10 +84,7 @@ class EelbrainPlotly2DViz:
         from eelbrain import datasets
 
         # Load MNE sample data
-        if data_source_location is None:
-            data_ds = datasets.get_mne_sample(src='vol', ori='vector')
-        else:
-            data_ds = datasets.load(data_source_location)
+        data_ds = datasets.get_mne_sample(src='vol', ori='vector')
 
         # Set parcellation if region is specified
         if region is not None:
@@ -813,12 +804,12 @@ if __name__ == '__main__':
         #     arrow_threshold='auto'  # Only show significant arrows
         # )
 
-        # Method 2: Use the original approach with data_source_location and region
+        # Method 2: Use default MNE sample data with region filtering
         viz_2d = EelbrainPlotly2DViz(
             region='aparc+aseg',
             cmap=cmap,
             show_max_only=False,
-            arrow_threshold=1  # Only show arrows with magnitude > 10% of max
+            arrow_threshold=None  # Show all arrows
         )
 
         # Example: Export plot images
