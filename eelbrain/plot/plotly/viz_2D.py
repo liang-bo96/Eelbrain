@@ -60,7 +60,8 @@ class EelbrainPlotly2DViz:
             Plotly colorscale for heatmaps. Can be:
             - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
             - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
-            Default is 'Hot'.
+            Default is 'Hot'. See https://plotly.com/python/builtin-colorscales/
+            for all available built-in colorscales.
         show_max_only : bool, optional
             If True, butterfly plot shows only mean and max traces.
             If False, butterfly plot shows individual source traces, mean, and max.
