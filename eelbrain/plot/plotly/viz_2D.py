@@ -561,9 +561,7 @@ class EelbrainPlotly2DViz:
 
             # Add vector arrows if we have vector data
             if active_vectors is not None:
-                arrow_scale = 0.008  # Scale arrows for visibility
-                max_arrows = 50  # Limit number of arrows for performance
-                step = max(1, len(active_coords) // max_arrows)
+                arrow_scale = 0.025  # Scale arrows for visibility - increased for better visibility
 
                 # Calculate arrow magnitudes for filtering
                 arrow_magnitudes = np.linalg.norm(active_vectors, axis=1)
@@ -581,7 +579,8 @@ class EelbrainPlotly2DViz:
                     threshold_value = float(self.arrow_threshold)
                     show_arrow_mask = arrow_magnitudes > threshold_value
 
-                for i in range(0, len(active_coords), step):
+                # Show ALL arrows that meet the threshold criteria (no performance limits)
+                for i in range(len(active_coords)):
                     # Only show arrow if it meets the threshold criteria
                     if not show_arrow_mask[i]:
                         continue
@@ -818,7 +817,7 @@ if __name__ == '__main__':
             region='aparc+aseg',
             cmap=cmap,
             show_max_only=False,
-            arrow_threshold=1  # Only show arrows with magnitude > 10% of max
+            arrow_threshold=None  # Show all arrows
         )
 
         # Example: Export plot images
