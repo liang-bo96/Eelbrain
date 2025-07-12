@@ -279,16 +279,20 @@ class EelbrainPlotly2DViz:
             if not click_data or self.time_values is None:
                 return dash.no_update, dash.no_update
 
-            point = click_data['points'][0]
+            try:
+                point = click_data['points'][0]
 
-            # Get clicked time
-            clicked_time = point['x']
-            time_idx = np.argmin(np.abs(self.time_values - clicked_time))
+                # Get clicked time
+                clicked_time = point['x']
+                time_idx = np.argmin(np.abs(self.time_values - clicked_time))
 
-            # Get clicked source
-            source_idx = point.get('customdata', None)
+                # Get clicked source - for background clicks this will be None
+                source_idx = point.get('customdata', None)
 
-            return time_idx, source_idx
+                return time_idx, source_idx
+            except (KeyError, IndexError, TypeError):
+                # If click data is malformed, just return no update
+                return dash.no_update, dash.no_update
 
         @self.app.callback(
             Output('update-status', 'children'),
@@ -360,6 +364,33 @@ class EelbrainPlotly2DViz:
 
         data_to_plot = data_to_plot * scale_factor
 
+        # Calculate y-axis range for layout and clickable background
+        y_min, y_max = data_to_plot.min(), data_to_plot.max()
+        y_margin = (y_max - y_min) * 0.1 if y_max != y_min else 1
+
+        # Add invisible clickable markers FIRST so they're behind other traces
+        # Create a dense grid of invisible markers to capture clicks anywhere
+        n_rows = 5  # Number of rows of markers to cover the plot vertically
+        y_positions = np.linspace(y_min - y_margin/2, y_max + y_margin/2, n_rows)
+        
+        # Create markers at multiple vertical positions
+        x_grid = np.tile(self.time_values, n_rows)
+        y_grid = np.repeat(y_positions, len(self.time_values))
+        
+        fig.add_trace(go.Scatter(
+            x=x_grid,
+            y=y_grid,
+            mode='markers',
+            marker=dict(
+                size=35,  # Large invisible markers
+                color='rgba(0,0,0,0.001)',  # Nearly transparent (but not completely)
+                line=dict(width=0)
+            ),
+            showlegend=False,
+            hovertemplate='Time: %{x:.3f}s<extra></extra>',  # Show time on hover
+            name='clickable_background'
+        ))
+
         # Add individual source traces only if show_max_only is False
         if not self.show_max_only:
             # Plot subset of traces for performance
@@ -409,10 +440,6 @@ class EelbrainPlotly2DViz:
             selected_time = self.time_values[selected_time_idx]
             fig.add_vline(x=selected_time, line_width=2, line_dash="dash", line_color="blue")
 
-        # Set layout
-        y_min, y_max = data_to_plot.min(), data_to_plot.max()
-        y_margin = (y_max - y_min) * 0.1 if y_max != y_min else 1
-
         # Update title based on display mode
         if self.show_max_only:
             title_text = f"Source Activity Time Series - Mean & Max Only ({n_sources} sources)"
@@ -426,7 +453,9 @@ class EelbrainPlotly2DViz:
             yaxis=dict(range=[y_min - y_margin, y_max + y_margin]),
             hovermode='closest',
             height=500,
-            showlegend=True
+            showlegend=True,
+            # Enable clicking on the plot area
+            clickmode='event+select'
         )
 
         return fig
