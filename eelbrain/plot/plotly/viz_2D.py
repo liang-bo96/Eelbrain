@@ -13,7 +13,28 @@ from eelbrain import set_parc, NDVar
 
 
 class EelbrainPlotly2DViz:
-    """Interactive 2D brain visualization for brain data using Plotly and Dash."""
+    """Interactive 2D brain visualization for brain data using Plotly and Dash.
+    
+    Based on :class:`plot.GlassBrain`, provides interactive 2D projections of brain
+    volume data with butterfly plot and arrow visualization for vector data.
+    
+    Parameters
+    ----------
+    y : NDVar, optional
+        Data to plot ([case,] time, source[, space]).
+        If ``y`` has a case dimension, the mean is plotted.
+        If ``y`` has a space dimension, the norm is plotted.
+        If None, uses MNE sample data for demonstration.
+    
+    Notes
+    -----
+    Expected input format follows the same pattern as :class:`plot.GlassBrain`:
+    
+    - For vector data: NDVar with dimensions ([case,] time, source, space)
+    - For scalar data: NDVar with dimensions ([case,] time, source)
+    - If case dimension present: mean across cases is plotted
+    - If space dimension present: norm across space is plotted for butterfly plot
+    """
 
     def __init__(
             self,
@@ -49,6 +70,15 @@ class EelbrainPlotly2DViz:
             magnitude greater than this value will be displayed. If None, all arrows
             are shown. If 'auto', uses 10% of the maximum magnitude as threshold.
             Default is None.
+
+        Notes
+        -----
+        Expected input format follows the same pattern as :class:`plot.GlassBrain`:
+
+        - For vector data: NDVar with dimensions ([case,] time, source, space)
+        - For scalar data: NDVar with dimensions ([case,] time, source)
+        - If case dimension present: mean across cases is plotted
+        - If space dimension present: norm across space is plotted for butterfly plot
         """
         self.app = dash.Dash(__name__)
 
@@ -789,16 +819,16 @@ if __name__ == '__main__':
         # arrow_threshold='auto': Show arrows with magnitude > 10% of max
         # arrow_threshold=0.01: Show arrows with magnitude > 0.01 (custom threshold)
 
-        # Method 1: Pass data directly using y parameter (similar to plot.GlassBrain.butterfly)
+        # Method 1: Pass data directly using y parameter (same as plot.GlassBrain)
         # from eelbrain import datasets
         #
-        # # Load data
+        # # Load your data - NDVar with dimensions ([case,] time, source[, space])
         # data_ds = datasets.get_mne_sample(src='vol', ori='vector')
         # y = data_ds['src']  # NDVar with dimensions (case, time, source, space)
         #
-        # # Create visualization with direct data and arrow filtering
+        # # Create visualization with your data
         # viz_2d = EelbrainPlotly2DViz(
-        #     y=y,  # Pass NDVar directly
+        #     y=y,  # Pass NDVar directly - same format as plot.GlassBrain
         #     cmap=cmap,
         #     show_max_only=False,
         #     arrow_threshold='auto'  # Only show significant arrows
