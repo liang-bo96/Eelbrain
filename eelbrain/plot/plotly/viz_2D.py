@@ -1,7 +1,7 @@
 import base64
 import io
 import random
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Tuple, Any
 
 import dash
 from dash import dcc, html, Input, Output, State
@@ -81,17 +81,17 @@ class EelbrainPlotly2DViz:
         - If case dimension present: mean across cases is plotted
         - If space dimension present: norm across space is plotted for butterfly plot
         """
-        self.app = dash.Dash(__name__)
+        self.app: dash.Dash = dash.Dash(__name__)
 
         # Initialize data attributes
-        self.glass_brain_data = None  # (n_sources, 3, n_times)
-        self.butterfly_data = None    # (n_sources, n_times)
-        self.source_coords = None     # (n_sources, 3)
-        self.time_values = None       # (n_times,)
-        self.region_of_brain = region  # Region of brain to visualize
-        self.cmap = cmap  # Colorscale for heatmaps
-        self.show_max_only = show_max_only  # Control butterfly plot display mode
-        self.arrow_threshold = arrow_threshold  # Threshold for displaying arrows
+        self.glass_brain_data: Optional[np.ndarray] = None  # (n_sources, 3, n_times)
+        self.butterfly_data: Optional[np.ndarray] = None    # (n_sources, n_times)
+        self.source_coords: Optional[np.ndarray] = None     # (n_sources, 3)
+        self.time_values: Optional[np.ndarray] = None       # (n_times,)
+        self.region_of_brain: Optional[str] = region  # Region of brain to visualize
+        self.cmap: Union[str, List] = cmap  # Colorscale for heatmaps
+        self.show_max_only: bool = show_max_only  # Control butterfly plot display mode
+        self.arrow_threshold: Optional[Union[float, str]] = arrow_threshold  # Threshold for displaying arrows
 
         # Load data
         if y is not None:
@@ -103,7 +103,7 @@ class EelbrainPlotly2DViz:
         self._setup_layout()
         self._setup_callbacks()
 
-    def _load_source_data(self, region=None):
+    def _load_source_data(self, region: Optional[str] = None) -> None:
         """Load MNE sample data and prepare for 2D brain visualization.
 
         Parameters
@@ -133,16 +133,16 @@ class EelbrainPlotly2DViz:
         self.time_values = src_ndvar.time.times
 
         # Store source space info
-        self.source_space = src_ndvar.source
+        self.source_space: Any = src_ndvar.source
         if hasattr(self.source_space, 'parc'):
-            self.parcellation = self.source_space.parc
+            self.parcellation: Any = self.source_space.parc
         else:
-            self.parcellation = None
+            self.parcellation: Optional[Any] = None
 
         # Compute norm for butterfly plot
         self.butterfly_data = np.linalg.norm(self.glass_brain_data, axis=1)
 
-    def _load_ndvar_data(self, y):
+    def _load_ndvar_data(self, y: NDVar) -> None:
         """Load data from NDVar directly.
 
         Parameters
@@ -159,12 +159,12 @@ class EelbrainPlotly2DViz:
         self.time_values = y.time.times
 
         # Store source space info
-        self.source_space = source
+        self.source_space: Any = source
         if hasattr(self.source_space, 'parc'):
-            self.parcellation = self.source_space.parc
+            self.parcellation: Any = self.source_space.parc
             self.region_of_brain = str(self.parcellation)
         else:
-            self.parcellation = None
+            self.parcellation: Optional[Any] = None
             self.region_of_brain = 'Full Brain'
 
         # Handle space dimension (vector data)
@@ -180,7 +180,7 @@ class EelbrainPlotly2DViz:
             # Expand to 3D for consistency (assuming scalar represents magnitude)
             self.glass_brain_data = self.glass_brain_data[:, np.newaxis, :]  # (n_sources, 1, n_times)
 
-    def _setup_layout(self):
+    def _setup_layout(self) -> None:
         """Setup the Dash app layout."""
         # Create initial figures
         initial_butterfly = self.create_butterfly_plot(0)
@@ -238,7 +238,7 @@ class EelbrainPlotly2DViz:
             html.Div(id='info-panel', style={'clear': 'both', 'padding': '20px'})
         ])
 
-    def _setup_callbacks(self):
+    def _setup_callbacks(self) -> None:
         """Setup all Dash callbacks."""
 
         @self.app.callback(
@@ -333,7 +333,7 @@ class EelbrainPlotly2DViz:
             result = html.P(' | '.join(info)) if info else html.P("Click on the plots to interact")
             return result
 
-    def create_butterfly_plot(self, selected_time_idx=0):
+    def create_butterfly_plot(self, selected_time_idx: int = 0) -> go.Figure:
         """Create butterfly plot figure."""
         fig = go.Figure()
 
@@ -433,7 +433,7 @@ class EelbrainPlotly2DViz:
 
         return fig
 
-    def create_2d_brain_projections_plotly(self, time_idx=0, source_idx=None):
+    def create_2d_brain_projections_plotly(self, time_idx: int = 0, source_idx: Optional[int] = None) -> Dict[str, go.Figure]:
         """Create 2D brain projections using Plotly scatter plots."""
         if self.glass_brain_data is None or self.source_coords is None or self.time_values is None:
             placeholder_fig = go.Figure()
@@ -481,7 +481,7 @@ class EelbrainPlotly2DViz:
                 'coronal': placeholder_fig
             }
 
-    def _create_plotly_brain_projection(self, view_name, coords, activity, time_value, selected_source=None):
+    def _create_plotly_brain_projection(self, view_name: str, coords: np.ndarray, activity: np.ndarray, time_value: float, selected_source: Optional[int] = None) -> go.Figure:
         """Create a Plotly plot for a specific brain view with vector arrows."""
         # Show all data without filtering
         active_coords = coords
@@ -693,7 +693,7 @@ class EelbrainPlotly2DViz:
 
         return fig
 
-    def _fig_to_base64(self, fig):
+    def _fig_to_base64(self, fig: plt.Figure) -> str:
         """Convert matplotlib figure to base64 string for Dash display."""
         try:
             # Save figure to bytes buffer
@@ -710,7 +710,7 @@ class EelbrainPlotly2DViz:
         except Exception:
             return self._create_placeholder_image("Conversion Error")
 
-    def _create_placeholder_image(self, text="No Data"):
+    def _create_placeholder_image(self, text: str = "No Data") -> str:
         """Create a placeholder image when brain plotting fails."""
 
         # Create a simple matplotlib figure
@@ -727,7 +727,7 @@ class EelbrainPlotly2DViz:
 
         return img_base64
 
-    def run(self, port=None, debug=True):
+    def run(self, port: Optional[int] = None, debug: bool = True) -> None:
         """Run the Dash app."""
         if port is None:
             port = random.randint(8001, 9001)
@@ -737,7 +737,7 @@ class EelbrainPlotly2DViz:
 
         self.app.run(debug=debug, port=port)
 
-    def export_images(self, output_dir="./images", time_idx=None, format="png"):
+    def export_images(self, output_dir: str = "./images", time_idx: Optional[int] = None, format: str = "png") -> Dict[str, Any]:
         """Export current plots as image files.
 
         Parameters
