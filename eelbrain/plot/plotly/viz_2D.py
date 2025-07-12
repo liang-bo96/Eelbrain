@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 
-from eelbrain import set_parc, NDVar
+from eelbrain import set_parc, NDVar, datasets
 
 
 class EelbrainPlotly2DViz:
@@ -112,8 +112,6 @@ class EelbrainPlotly2DViz:
             Brain region to load using aparc+aseg parcellation.
             If None, loads all regions.
         """
-        from eelbrain import datasets
-
         # Load MNE sample data
         data_ds = datasets.get_mne_sample(src='vol', ori='vector')
 
@@ -494,17 +492,20 @@ class EelbrainPlotly2DViz:
         # Get time index for vector components
         time_idx = np.argmin(np.abs(self.time_values - time_value))
 
-        # Get 3D vector components for active sources
+        # Get vector components for active sources
         if self.glass_brain_data is not None and len(active_indices) > 0:
-            active_vectors = self.glass_brain_data[active_indices, :, time_idx]  # (n_active, 3)
+            active_vectors = self.glass_brain_data[active_indices, :, time_idx]  # (n_active, 3) or (n_active, 1)
         else:
             active_vectors = None
+
+        # Check if we have vector data (3D) or scalar data (1D)
+        has_vector_data = active_vectors is not None and active_vectors.shape[1] == 3
 
         # Project to 2D based on view
         if view_name == 'axial':  # Z view (X vs Y)
             x_coords = active_coords[:, 0]
             y_coords = active_coords[:, 1]
-            if active_vectors is not None:
+            if has_vector_data:
                 u_vectors = active_vectors[:, 0]  # X components
                 v_vectors = active_vectors[:, 1]  # Y components
             title = f'Axial View (Z) - {self.region_of_brain}'
@@ -512,7 +513,7 @@ class EelbrainPlotly2DViz:
         elif view_name == 'sagittal':  # X view (Y vs Z)
             x_coords = active_coords[:, 1]
             y_coords = active_coords[:, 2]
-            if active_vectors is not None:
+            if has_vector_data:
                 u_vectors = active_vectors[:, 1]  # Y components
                 v_vectors = active_vectors[:, 2]  # Z components
             title = f'Sagittal View (X) - {self.region_of_brain}'
@@ -520,7 +521,7 @@ class EelbrainPlotly2DViz:
         elif view_name == 'coronal':  # Y view (X vs Z)
             x_coords = active_coords[:, 0]
             y_coords = active_coords[:, 2]
-            if active_vectors is not None:
+            if has_vector_data:
                 u_vectors = active_vectors[:, 0]  # X components
                 v_vectors = active_vectors[:, 2]  # Z components
             title = f'Coronal View (Y) - {self.region_of_brain}'
@@ -581,11 +582,12 @@ class EelbrainPlotly2DViz:
                 paper_bgcolor='white'
             )
 
-            # Add vector arrows if we have vector data
-            if active_vectors is not None:
-                arrow_scale = 0.008  # Scale arrows for visibility
-                max_arrows = 50  # Limit number of arrows for performance
-                step = max(1, len(active_coords) // max_arrows)
+            # Add vector arrows if we have vector data (not scalar data)
+            if has_vector_data:
+                arrow_scale = 0.025  # Scale arrows for visibility - increased for better visibility
+                # Performance limit for arrows
+                max_arrows = 100  # Limit arrows for performance
+                arrow_step = max(1, len(active_coords) // max_arrows)
 
                 # Calculate arrow magnitudes for filtering
                 arrow_magnitudes = np.linalg.norm(active_vectors, axis=1)
@@ -602,8 +604,8 @@ class EelbrainPlotly2DViz:
                     # Use specified threshold
                     threshold_value = float(self.arrow_threshold)
                     show_arrow_mask = arrow_magnitudes > threshold_value
-
-                for i in range(0, len(active_coords), step):
+                
+                for i in range(0, len(active_coords), arrow_step):
                     # Only show arrow if it meets the threshold criteria
                     if not show_arrow_mask[i]:
                         continue
@@ -644,7 +646,7 @@ class EelbrainPlotly2DViz:
                     ))
 
                     # Highlight selected source arrow if vectors available
-                    if active_vectors is not None:
+                    if has_vector_data:
                         # Check if the selected source arrow meets the threshold
                         selected_arrow_magnitude = np.linalg.norm(active_vectors[pos])
                         show_selected_arrow = True
