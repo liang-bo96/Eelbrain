@@ -5,6 +5,17 @@ from typing import Optional, Union, List, Dict, Any
 
 import dash
 from dash import dcc, html, Input, Output, State
+
+# Check if we're running in a Jupyter environment
+def _is_jupyter_environment():
+    """Check if we're running in a Jupyter notebook environment."""
+    try:
+        from IPython import get_ipython
+        return get_ipython() is not None
+    except ImportError:
+        return False
+
+JUPYTER_AVAILABLE = _is_jupyter_environment()
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
@@ -81,6 +92,7 @@ class EelbrainPlotly2DViz:
         - If case dimension present: mean across cases is plotted
         - If space dimension present: norm across space is plotted for butterfly plot
         """
+        # Use regular Dash with modern Jupyter integration
         self.app: dash.Dash = dash.Dash(__name__)
 
         # Initialize data attributes
@@ -186,7 +198,7 @@ class EelbrainPlotly2DViz:
 
         self.app.layout = html.Div([
             html.H1("Eelbrain Plotly 2D Brain Visualization",
-                    style={'textAlign': 'center'}),
+                    style={'textAlign': 'center', 'margin': '10px 0'}),
 
             # Hidden stores for state management
             dcc.Store(id='selected-time-idx', data=0),
@@ -233,8 +245,8 @@ class EelbrainPlotly2DViz:
             ]),
 
             # Info panel
-            html.Div(id='info-panel', style={'clear': 'both', 'padding': '20px'})
-        ])
+            html.Div(id='info-panel', style={'clear': 'both', 'padding': '10px', 'textAlign': 'center'})
+        ], style={'width': '100%', 'height': '100%', 'padding': '5px'})
 
     def _setup_callbacks(self) -> None:
         """Setup all Dash callbacks."""
@@ -759,15 +771,78 @@ class EelbrainPlotly2DViz:
 
         return img_base64
 
-    def run(self, port: Optional[int] = None, debug: bool = True) -> None:
-        """Run the Dash app."""
+    def run(self, port: Optional[int] = None, debug: bool = True, mode: str = 'external', 
+            width: int = 1200, height: int = 900) -> None:
+        """Run the Dash app with Jupyter integration support.
+        
+        Parameters
+        ----------
+        port : int, optional
+            Port number for the server. If None, uses random port.
+        debug : bool, optional
+            Enable debug mode. Default is True.
+        mode : str, optional
+            Display mode. Options:
+            - 'external': Open in separate browser window (default)
+            - 'inline': Embed directly in Jupyter notebook (modern Dash)
+            - 'jupyterlab': Open in JupyterLab tab (modern Dash)
+        width : int, optional
+            Display width in pixels for Jupyter integration. Default is 1200.
+        height : int, optional
+            Display height in pixels for Jupyter integration. Default is 900.
+        """
         if port is None:
             port = random.randint(8001, 9001)
 
-        print(f"\nStarting 2D Brain Visualization Dash app on port {port}...")
-        print(f"Open http://127.0.0.1:{port}/ in your browser\n")
+        if JUPYTER_AVAILABLE and mode in ['inline', 'jupyterlab']:
+            print(f"\nStarting 2D Brain Visualization with modern Dash Jupyter integration...")
+            print(f"Mode: {mode}, Size: {width}x{height}px")
+            
+            # Use modern Dash Jupyter integration
+            self.app.run(
+                debug=debug,
+                port=port,
+                mode=mode,
+                width=width,
+                height=height
+            )
+        else:
+            print(f"\nStarting 2D Brain Visualization Dash app on port {port}...")
+            print(f"Open http://127.0.0.1:{port}/ in your browser")
+            if not JUPYTER_AVAILABLE and mode != 'external':
+                print("Note: Jupyter environment not detected, using external browser mode")
+            print()
 
-        self.app.run(debug=debug, port=port)
+            self.app.run(debug=debug, port=port)
+    
+    def show_in_jupyter(self, width: int = 1200, height: int = 900, debug: bool = False) -> None:
+        """Convenience method to display the visualization inline in Jupyter notebooks.
+        
+        Parameters
+        ----------
+        width : int, optional
+            Display width in pixels. Default is 1200.
+        height : int, optional
+            Display height in pixels. Default is 900.
+        debug : bool, optional
+            Enable debug mode. Default is False for cleaner output.
+            
+        Examples
+        --------
+        Basic usage in Jupyter:
+        >>> viz = EelbrainPlotly2DViz()
+        >>> viz.show_in_jupyter()
+        
+        Custom sizing:
+        >>> viz.show_in_jupyter(width=1400, height=1000)
+        """
+        if not JUPYTER_AVAILABLE:
+            print("Warning: Jupyter environment not detected.")
+            print("Falling back to external browser mode...")
+            self.run(debug=debug)
+            return
+        
+        self.run(mode='inline', width=width, height=height, debug=debug)
 
     def export_images(self, output_dir: str = "./images", time_idx: Optional[int] = None, format: str = "png") -> Dict[str, Any]:
         """Export current plots as image files.
@@ -884,6 +959,10 @@ if __name__ == '__main__':
         # )
         # print("Export result:", result)
 
+        # For Jupyter notebooks, use:
+        # viz_2d.show_in_jupyter(width=1200, height=900)
+        
+        # For regular Python scripts or external browser:
         viz_2d.run()
 
     except Exception as e:
