@@ -218,17 +218,17 @@ class EelbrainPlotly2DViz:
                     html.Div([
                         html.Div([
                             dcc.Graph(id='brain-axial-plot', figure=initial_brain_plots['axial'],
-                                      style={'height': '300px'})
+                                      style={'height': '450px'})
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
 
                         html.Div([
                             dcc.Graph(id='brain-sagittal-plot', figure=initial_brain_plots['sagittal'],
-                                      style={'height': '300px'})
+                                      style={'height': '450px'})
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
 
                         html.Div([
                             dcc.Graph(id='brain-coronal-plot', figure=initial_brain_plots['coronal'],
-                                      style={'height': '300px'})
+                                      style={'height': '450px'})
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
                     ], style={'textAlign': 'center'}),
 
@@ -492,13 +492,22 @@ class EelbrainPlotly2DViz:
             else:  # (n_sources, n_times)
                 activity_magnitude = self.glass_brain_data[:, time_idx]
 
+            # Calculate global min/max for consistent colorbar across all views
+            global_min = np.min(activity_magnitude)
+            global_max = np.max(activity_magnitude)
+
             # Create brain projections
             brain_plots = {}
             views = ['axial', 'sagittal', 'coronal']
 
             for view_name in views:
                 try:
-                    brain_fig = self._create_plotly_brain_projection(view_name, self.source_coords, activity_magnitude, time_value, source_idx)
+                    # Only show colorbar on the last view (coronal)
+                    show_colorbar = (view_name == 'coronal')
+                    brain_fig = self._create_plotly_brain_projection(
+                        view_name, self.source_coords, activity_magnitude, time_value, source_idx,
+                        show_colorbar=show_colorbar, zmin=global_min, zmax=global_max
+                    )
                     brain_plots[view_name] = brain_fig
                 except Exception:
                     brain_plots[view_name] = go.Figure()
@@ -515,7 +524,10 @@ class EelbrainPlotly2DViz:
                 'coronal': placeholder_fig
             }
 
-    def _create_plotly_brain_projection(self, view_name: str, coords: np.ndarray, activity: np.ndarray, time_value: float, selected_source: Optional[int] = None) -> go.Figure:
+    def _create_plotly_brain_projection(self, view_name: str, coords: np.ndarray, activity: np.ndarray,
+                                        time_value: float, selected_source: Optional[int] = None,
+                                        show_colorbar: bool = True, zmin: float = None,
+                                        zmax: float = None) -> go.Figure:
         """Create a Plotly plot for a specific brain view with vector arrows."""
         # Show all data without filtering
         active_coords = coords
@@ -593,12 +605,20 @@ class EelbrainPlotly2DViz:
                                                            bins=[x_edges, y_edges],
                                                            weights=active_activity)
 
+            # Create count histogram to compute average weights per bin
+            H_count, _, _ = np.histogram2d(x_coords, y_coords,
+                                           bins=[x_edges, y_edges])
+
+            # Compute average activity per bin (avoid division by zero)
+            # This prevents multiple sources in the same grid cell from summing up
+            H_avg = np.divide(H, H_count, out=np.zeros_like(H), where=H_count != 0)
+
             # Use grid center points for display
             x_centers = (x_edges_used[:-1] + x_edges_used[1:]) / 2
             y_centers = (y_edges_used[:-1] + y_edges_used[1:]) / 2
 
             # Set zero values to NaN to make them transparent in heatmap
-            H_display = H.copy()
+            H_display = H_avg.copy()  # Use averaged data instead of summed data
             H_display[H_display == 0] = np.nan
 
             # Add heatmap trace
@@ -607,8 +627,10 @@ class EelbrainPlotly2DViz:
                 y=y_centers,
                 z=H_display.T,  # Transpose to match Plotly orientation
                 colorscale=self.cmap,
-                colorbar=dict(title="Activity Magnitude"),
-                showscale=True,
+                colorbar=dict(title="Activity Magnitude") if show_colorbar else None,
+                showscale=show_colorbar,
+                zmin=zmin,
+                zmax=zmax,
                 hovertemplate=f'{xlabel}: %{{x:.3f}}<br>{ylabel}: %{{y:.3f}}<br>Activity: %{{z:.2e}}<extra></extra>'
             ))
 
@@ -725,7 +747,7 @@ class EelbrainPlotly2DViz:
             xaxis_title=xlabel,
             yaxis_title=ylabel,
             xaxis=dict(scaleanchor="y", scaleratio=1),  # Equal aspect ratio
-            height=300,
+            height=450,
             margin=dict(l=40, r=40, t=40, b=40),
             showlegend=False
         )
