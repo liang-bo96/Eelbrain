@@ -6,6 +6,7 @@ from typing import Optional, Union, List, Dict, Any
 import dash
 from dash import dcc, html, Input, Output, State
 
+
 # Check if we're running in a Jupyter environment
 def _is_jupyter_environment():
     """Check if we're running in a Jupyter notebook environment."""
@@ -208,30 +209,24 @@ class EelbrainPlotly2DViz:
             html.Div([
                 # Top: Butterfly plot
                 html.Div([
-                    html.H3("Butterfly Plot"),
                     dcc.Graph(id='butterfly-plot', figure=initial_butterfly)
                 ], style={'width': '100%', 'margin-bottom': '20px'}),
 
                 # Bottom: 2D Brain projections using Plotly
                 html.Div([
-                    html.H3("2D Brain Projections"),
-
                     # Three brain view plots
                     html.Div([
                         html.Div([
-                            html.H4("Axial (Z)", style={'textAlign': 'center', 'margin': '5px'}),
                             dcc.Graph(id='brain-axial-plot', figure=initial_brain_plots['axial'],
                                       style={'height': '300px'})
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
 
                         html.Div([
-                            html.H4("Sagittal (X)", style={'textAlign': 'center', 'margin': '5px'}),
                             dcc.Graph(id='brain-sagittal-plot', figure=initial_brain_plots['sagittal'],
                                       style={'height': '300px'})
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
 
                         html.Div([
-                            html.H4("Coronal (Y)", style={'textAlign': 'center', 'margin': '5px'}),
                             dcc.Graph(id='brain-coronal-plot', figure=initial_brain_plots['coronal'],
                                       style={'height': '300px'})
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
@@ -384,11 +379,11 @@ class EelbrainPlotly2DViz:
         # Create a dense grid of invisible markers to capture clicks anywhere
         n_rows = 5  # Number of rows of markers to cover the plot vertically
         y_positions = np.linspace(y_min - y_margin/2, y_max + y_margin/2, n_rows)
-        
+
         # Create markers at multiple vertical positions
         x_grid = np.tile(self.time_values, n_rows)
         y_grid = np.repeat(y_positions, len(self.time_values))
-        
+
         fig.add_trace(go.Scatter(
             x=x_grid,
             y=y_grid,
@@ -549,7 +544,7 @@ class EelbrainPlotly2DViz:
             if has_vector_data:
                 u_vectors = active_vectors[:, 0]  # X components
                 v_vectors = active_vectors[:, 1]  # Y components
-            title = f'Axial View (Z) - {self.region_of_brain}'
+            title = None
             xlabel, ylabel = 'X (m)', 'Y (m)'
         elif view_name == 'sagittal':  # X view (Y vs Z)
             x_coords = active_coords[:, 1]
@@ -557,7 +552,7 @@ class EelbrainPlotly2DViz:
             if has_vector_data:
                 u_vectors = active_vectors[:, 1]  # Y components
                 v_vectors = active_vectors[:, 2]  # Z components
-            title = f'Sagittal View (X) - {self.region_of_brain}'
+            title = None
             xlabel, ylabel = 'Y (m)', 'Z (m)'
         elif view_name == 'coronal':  # Y view (X vs Z)
             x_coords = active_coords[:, 0]
@@ -565,7 +560,7 @@ class EelbrainPlotly2DViz:
             if has_vector_data:
                 u_vectors = active_vectors[:, 0]  # X components
                 v_vectors = active_vectors[:, 2]  # Z components
-            title = f'Coronal View (Y) - {self.region_of_brain}'
+            title = None
             xlabel, ylabel = 'X (m)', 'Z (m)'
 
         if len(active_coords) > 0:
@@ -771,10 +766,10 @@ class EelbrainPlotly2DViz:
 
         return img_base64
 
-    def run(self, port: Optional[int] = None, debug: bool = True, mode: str = 'external', 
+    def run(self, port: Optional[int] = None, debug: bool = True, mode: str = 'external',
             width: int = 1200, height: int = 900) -> None:
         """Run the Dash app with Jupyter integration support.
-        
+
         Parameters
         ----------
         port : int, optional
@@ -797,7 +792,7 @@ class EelbrainPlotly2DViz:
         if JUPYTER_AVAILABLE and mode in ['inline', 'jupyterlab']:
             print(f"\nStarting 2D Brain Visualization with modern Dash Jupyter integration...")
             print(f"Mode: {mode}, Size: {width}x{height}px")
-            
+
             # Use modern Dash Jupyter integration
             self.app.run(
                 debug=debug,
@@ -814,10 +809,10 @@ class EelbrainPlotly2DViz:
             print()
 
             self.app.run(debug=debug, port=port)
-    
+
     def show_in_jupyter(self, width: int = 1200, height: int = 900, debug: bool = False) -> None:
         """Convenience method to display the visualization inline in Jupyter notebooks.
-        
+
         Parameters
         ----------
         width : int, optional
@@ -826,13 +821,13 @@ class EelbrainPlotly2DViz:
             Display height in pixels. Default is 900.
         debug : bool, optional
             Enable debug mode. Default is False for cleaner output.
-            
+
         Examples
         --------
         Basic usage in Jupyter:
         >>> viz = EelbrainPlotly2DViz()
         >>> viz.show_in_jupyter()
-        
+
         Custom sizing:
         >>> viz.show_in_jupyter(width=1400, height=1000)
         """
@@ -841,7 +836,7 @@ class EelbrainPlotly2DViz:
             print("Falling back to external browser mode...")
             self.run(debug=debug)
             return
-        
+
         self.run(mode='inline', width=width, height=height, debug=debug)
 
     def export_images(self, output_dir: str = "./images", time_idx: Optional[int] = None, format: str = "png") -> Dict[str, Any]:
@@ -961,7 +956,7 @@ if __name__ == '__main__':
 
         # For Jupyter notebooks, use:
         # viz_2d.show_in_jupyter(width=1200, height=900)
-        
+
         # For regular Python scripts or external browser:
         viz_2d.run()
 
