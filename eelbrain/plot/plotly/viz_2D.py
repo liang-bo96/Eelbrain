@@ -105,6 +105,7 @@ class EelbrainPlotly2DViz:
         self.cmap: Union[str, List] = cmap  # Colorscale for heatmaps
         self.show_max_only: bool = show_max_only  # Control butterfly plot display mode
         self.arrow_threshold: Optional[Union[float, str]] = arrow_threshold  # Threshold for displaying arrows
+        self.is_jupyter_mode: bool = False  # Track if running in Jupyter mode
 
         # Load data
         if y is not None:
@@ -202,6 +203,24 @@ class EelbrainPlotly2DViz:
         initial_butterfly = self.create_butterfly_plot(0)
         initial_brain_plots = self.create_2d_brain_projections_plotly(0)
 
+        # Define styles based on mode
+        if self.is_jupyter_mode:
+            # Jupyter-specific styles
+            butterfly_style = {'width': '100%', 'margin-bottom': '10px'}
+            butterfly_graph_style = {'height': '300px'}  # Reduced height for Jupyter
+            brain_height = '250px'  # Reduced height for brain views
+            brain_width = '30%'  # Slightly smaller width
+            brain_margin = '1.5%'  # Larger margin for better spacing
+            container_padding = '2px'  # Minimal padding for Jupyter
+        else:
+            # Browser-specific styles
+            butterfly_style = {'width': '100%', 'margin-bottom': '20px'}
+            butterfly_graph_style = {'height': '400px'}  # Standard height
+            brain_height = '450px'  # Standard height for brain views
+            brain_width = '32%'  # Standard width
+            brain_margin = '0.5%'  # Standard margin
+            container_padding = '5px'  # Standard padding
+
         self.app.layout = html.Div([
             html.H1("Eelbrain Plotly 2D Brain Visualization",
                     style={'textAlign': 'center', 'margin': '10px 0'}),
@@ -214,8 +233,8 @@ class EelbrainPlotly2DViz:
             html.Div([
                 # Top: Butterfly plot
                 html.Div([
-                    dcc.Graph(id='butterfly-plot', figure=initial_butterfly)
-                ], style={'width': '100%', 'margin-bottom': '20px'}),
+                    dcc.Graph(id='butterfly-plot', figure=initial_butterfly, style=butterfly_graph_style)
+                ], style=butterfly_style),
 
                 # Bottom: 2D Brain projections using Plotly
                 html.Div([
@@ -223,18 +242,18 @@ class EelbrainPlotly2DViz:
                     html.Div([
                         html.Div([
                             dcc.Graph(id='brain-axial-plot', figure=initial_brain_plots['axial'],
-                                      style={'height': '450px'})  # Increased height
-                        ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
+                                      style={'height': brain_height})
+                        ], style={'width': brain_width, 'display': 'inline-block', 'margin': brain_margin}),
 
                         html.Div([
                             dcc.Graph(id='brain-sagittal-plot', figure=initial_brain_plots['sagittal'],
-                                      style={'height': '450px'})  # Increased height
-                        ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
+                                      style={'height': brain_height})
+                        ], style={'width': brain_width, 'display': 'inline-block', 'margin': brain_margin}),
 
                         html.Div([
                             dcc.Graph(id='brain-coronal-plot', figure=initial_brain_plots['coronal'],
-                                      style={'height': '450px'})  # Increased height
-                        ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
+                                      style={'height': brain_height})
+                        ], style={'width': brain_width, 'display': 'inline-block', 'margin': brain_margin}),
                     ], style={'textAlign': 'center'}),
 
                     # Status indicator
@@ -246,7 +265,7 @@ class EelbrainPlotly2DViz:
 
             # Info panel
             html.Div(id='info-panel', style={'clear': 'both', 'padding': '10px', 'textAlign': 'center'})
-        ], style={'width': '100%', 'height': '100%', 'padding': '5px'})
+        ], style={'width': '100%', 'height': '100%', 'padding': container_padding})
 
     def _setup_callbacks(self) -> None:
         """Setup all Dash callbacks."""
@@ -458,13 +477,22 @@ class EelbrainPlotly2DViz:
         else:
             title_text = f"Source Activity Time Series (showing subset of {n_sources} sources)"
 
+        # Adjust layout based on mode
+        if self.is_jupyter_mode:
+            height = 300
+            margin = dict(l=40, r=40, t=60, b=40)  # Reduced margins for Jupyter
+        else:
+            height = 500
+            margin = dict(l=40, r=40, t=60, b=40)  # Standard margins
+
         fig.update_layout(
             title=title_text,
             xaxis_title="Time (s)",
             yaxis_title=f"Activity{unit_suffix}",
             yaxis=dict(range=[y_min - y_margin, y_max + y_margin]),
             hovermode='closest',
-            height=500,
+            height=height,
+            margin=margin,
             showlegend=True,
             # Enable clicking on the plot area
             clickmode='event+select'
@@ -632,7 +660,7 @@ class EelbrainPlotly2DViz:
                 y=y_centers,
                 z=H_display.T,  # Transpose to match Plotly orientation
                 colorscale=self.cmap,
-                colorbar=dict(title="Activity Magnitude") if show_colorbar else None,
+                colorbar=dict(title="") if show_colorbar else None,
                 showscale=show_colorbar,
                 zmin=zmin,
                 zmax=zmax,
@@ -756,14 +784,21 @@ class EelbrainPlotly2DViz:
             fig.add_annotation(text=f"No active sources for {view_name} view",
                                xref="paper", yref="paper", x=0.5, y=0.5, showarrow=False)
 
-        # Update layout
+        # Update layout based on mode
+        if self.is_jupyter_mode:
+            height = 250
+            margin = dict(l=30, r=30, t=30, b=30)  # Reduced margins for Jupyter
+        else:
+            height = 450
+            margin = dict(l=40, r=40, t=40, b=40)  # Standard margins
+
         fig.update_layout(
             title=title,
             xaxis_title=xlabel,
             yaxis_title=ylabel,
             xaxis=dict(scaleanchor="y", scaleratio=1),  # Equal aspect ratio
-            height=450,  # Increased height to match layout
-            margin=dict(l=40, r=40, t=40, b=40),
+            height=height,
+            margin=margin,
             showlegend=False
         )
 
@@ -874,6 +909,10 @@ class EelbrainPlotly2DViz:
             self.run(debug=debug)
             return
 
+        # Set Jupyter mode and rebuild layout with Jupyter-specific styles
+        self.is_jupyter_mode = True
+        self._setup_layout()  # Rebuild layout with Jupyter styles
+        
         self.run(mode='inline', width=width, height=height, debug=debug)
 
     def export_images(self, output_dir: str = "./images", time_idx: Optional[int] = None, format: str = "png") -> Dict[str, Any]:
