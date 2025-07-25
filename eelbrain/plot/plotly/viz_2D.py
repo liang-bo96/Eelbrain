@@ -130,8 +130,13 @@ class EelbrainPlotly2DViz:
 
         # Set parcellation if region is specified
         if region is not None:
-            data_ds['src'] = set_parc(data_ds['src'], region)
-            self.region_of_brain = region
+            try:
+                data_ds['src'] = set_parc(data_ds['src'], region)
+                self.region_of_brain = region
+            except Exception as e:
+                print(f"Failed to apply parcellation {region}: {e}")
+                print("Using full brain data instead")
+                self.region_of_brain = 'Full Brain'
         else:
             self.region_of_brain = 'Full Brain'
 
@@ -218,17 +223,17 @@ class EelbrainPlotly2DViz:
                     html.Div([
                         html.Div([
                             dcc.Graph(id='brain-axial-plot', figure=initial_brain_plots['axial'],
-                                      style={'height': '450px'})
+                                      style={'height': '450px'})  # Increased height
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
 
                         html.Div([
                             dcc.Graph(id='brain-sagittal-plot', figure=initial_brain_plots['sagittal'],
-                                      style={'height': '450px'})
+                                      style={'height': '450px'})  # Increased height
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
 
                         html.Div([
                             dcc.Graph(id='brain-coronal-plot', figure=initial_brain_plots['coronal'],
-                                      style={'height': '450px'})
+                                      style={'height': '450px'})  # Increased height
                         ], style={'width': '32%', 'display': 'inline-block', 'margin': '0.5%'}),
                     ], style={'textAlign': 'center'}),
 
@@ -500,7 +505,7 @@ class EelbrainPlotly2DViz:
             brain_plots = {}
             views = ['axial', 'sagittal', 'coronal']
 
-            for view_name in views:
+            for i, view_name in enumerate(views):
                 try:
                     # Only show colorbar on the last view (coronal)
                     show_colorbar = (view_name == 'coronal')
@@ -660,19 +665,29 @@ class EelbrainPlotly2DViz:
                     threshold_value = float(self.arrow_threshold)
                     show_arrow_mask = arrow_magnitudes > threshold_value
 
-                # Performance limit for arrows
-                max_arrows = 100  # Limit arrows for performance
-                arrow_step = max(1, len(active_coords) // max_arrows)
+                # Group sources by position and select the one with maximum magnitude for each position
+                position_to_max_idx = {}
 
-                for i in range(0, len(active_coords), arrow_step):
-                    # Only show arrow if it meets the threshold criteria
+                # Remove performance limit, check all source points
+                for i in range(len(active_coords)):
+                    # Only consider arrows that meet the threshold criteria
                     if not show_arrow_mask[i]:
                         continue
 
-                    x_start = x_coords[i]
-                    y_start = y_coords[i]
-                    x_end = x_start + u_vectors[i] * arrow_scale
-                    y_end = y_start + v_vectors[i] * arrow_scale
+                    # Create position key (rounded to avoid floating point precision issues)
+                    pos_key = (round(x_coords[i], 6), round(y_coords[i], 6))
+
+                    # If this position hasn't been seen, or current arrow has larger magnitude
+                    if (pos_key not in position_to_max_idx or
+                            arrow_magnitudes[i] > arrow_magnitudes[position_to_max_idx[pos_key]]):
+                        position_to_max_idx[pos_key] = i
+
+                # Now draw only the maximum magnitude arrow for each position
+                for max_idx in position_to_max_idx.values():
+                    x_start = x_coords[max_idx]
+                    y_start = y_coords[max_idx]
+                    x_end = x_start + u_vectors[max_idx] * arrow_scale
+                    y_end = y_start + v_vectors[max_idx] * arrow_scale
 
                     # Add arrow annotation
                     fig.add_annotation(
@@ -747,7 +762,7 @@ class EelbrainPlotly2DViz:
             xaxis_title=xlabel,
             yaxis_title=ylabel,
             xaxis=dict(scaleanchor="y", scaleratio=1),  # Equal aspect ratio
-            height=450,
+            height=450,  # Increased height to match layout
             margin=dict(l=40, r=40, t=40, b=40),
             showlegend=False
         )
