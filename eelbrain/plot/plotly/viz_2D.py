@@ -37,6 +37,24 @@ class EelbrainPlotly2DViz:
         If ``y`` has a case dimension, the mean is plotted.
         If ``y`` has a space dimension, the norm is plotted.
         If None, uses MNE sample data for demonstration.
+    region
+        Brain region to load using aparc+aseg parcellation.
+        If None, loads all regions. Only used when y is None.
+    cmap
+        Plotly colorscale for heatmaps. Can be:
+        - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
+        - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
+        Default is 'Hot'. See https://plotly.com/python/builtin-colorscales/
+        for all available built-in colorscales.
+    show_max_only
+        If True, butterfly plot shows only mean and max traces.
+        If False, butterfly plot shows individual source traces, mean, and max.
+        Default is False.
+    arrow_threshold
+        Threshold for displaying arrows in brain projections. Only arrows with
+        magnitude greater than this value will be displayed. If None, all arrows
+        are shown. If 'auto', uses 10% of the maximum magnitude as threshold.
+        Default is None.
 
     Notes
     -----
@@ -56,43 +74,7 @@ class EelbrainPlotly2DViz:
             show_max_only: bool = False,
             arrow_threshold: Optional[Union[float, str]] = None
     ):
-        """Initialize the visualization app and load data.
-
-        Parameters
-        ----------
-        y
-            Data to plot ([case,] time, source[, space]).
-            If ``y`` has a case dimension, the mean is plotted.
-            If ``y`` has a space dimension, the norm is plotted.
-            If None, uses MNE sample data for demonstration.
-        region
-            Brain region to load using aparc+aseg parcellation.
-            If None, loads all regions. Only used when y is None.
-        cmap
-            Plotly colorscale for heatmaps. Can be:
-            - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
-            - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
-            Default is 'Hot'. See https://plotly.com/python/builtin-colorscales/
-            for all available built-in colorscales.
-        show_max_only
-            If True, butterfly plot shows only mean and max traces.
-            If False, butterfly plot shows individual source traces, mean, and max.
-            Default is False.
-        arrow_threshold
-            Threshold for displaying arrows in brain projections. Only arrows with
-            magnitude greater than this value will be displayed. If None, all arrows
-            are shown. If 'auto', uses 10% of the maximum magnitude as threshold.
-            Default is None.
-
-        Notes
-        -----
-        Expected input format follows the same pattern as :class:`plot.GlassBrain`:
-
-        - For vector data: NDVar with dimensions ([case,] time, source, space)
-        - For scalar data: NDVar with dimensions ([case,] time, source)
-        - If case dimension present: mean across cases is plotted
-        - If space dimension present: norm across space is plotted for butterfly plot
-        """
+        """Initialize the visualization app and load data."""
         # Use regular Dash with modern Jupyter integration
         self.app: dash.Dash = dash.Dash(__name__)
 
