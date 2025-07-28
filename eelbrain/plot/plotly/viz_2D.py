@@ -274,7 +274,7 @@ class EelbrainPlotly2DViz:
             Output('butterfly-plot', 'figure'),
             Input('selected-time-idx', 'data')
         )
-        def update_butterfly(time_idx):
+        def update_butterfly(time_idx: int) -> go.Figure:
             if time_idx is None:
                 time_idx = 0
             return self.create_butterfly_plot(time_idx)
@@ -286,7 +286,7 @@ class EelbrainPlotly2DViz:
             Input('selected-time-idx', 'data'),
             Input('selected-source-idx', 'data')
         )
-        def update_brain_projections(time_idx, source_idx):
+        def update_brain_projections(time_idx: int, source_idx: int) -> tuple[go.Figure, go.Figure, go.Figure]:
             if time_idx is None:
                 time_idx = 0
 
@@ -306,7 +306,8 @@ class EelbrainPlotly2DViz:
             Input('butterfly-plot', 'clickData'),
             State('selected-time-idx', 'data')
         )
-        def handle_butterfly_click(click_data, current_time_idx):
+        def handle_butterfly_click(click_data: Dict[str, Any], current_time_idx: int) -> tuple[
+            int | Any, int | None | Any]:
             if not click_data or self.time_values is None:
                 return dash.no_update, dash.no_update
 
@@ -330,7 +331,7 @@ class EelbrainPlotly2DViz:
             Output('update-status', 'style'),
             Input('selected-time-idx', 'data')
         )
-        def update_status(time_idx):
+        def update_status(time_idx: int) -> tuple[str, Dict[str, str]]:
             if time_idx is not None and self.time_values is not None and 0 <= time_idx < len(self.time_values):
                 time_val = self.time_values[time_idx]
                 status_text = f"Brain views updated for time: {time_val:.3f}s (index {time_idx})"
@@ -352,7 +353,7 @@ class EelbrainPlotly2DViz:
             Input('selected-time-idx', 'data'),
             Input('selected-source-idx', 'data')
         )
-        def update_info(time_idx, source_idx):
+        def update_info(time_idx: int, source_idx: int) -> html.P:
             info = []
 
             if self.time_values is not None and time_idx is not None and 0 <= time_idx < len(self.time_values):
@@ -912,7 +913,7 @@ class EelbrainPlotly2DViz:
         # Set Jupyter mode and rebuild layout with Jupyter-specific styles
         self.is_jupyter_mode = True
         self._setup_layout()  # Rebuild layout with Jupyter styles
-        
+
         self.run(mode='inline', width=width, height=height, debug=debug)
 
     def export_images(self, output_dir: str = "./images", time_idx: Optional[int] = None, format: str = "png") -> Dict[str, Any]:
