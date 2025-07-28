@@ -32,7 +32,7 @@ class EelbrainPlotly2DViz:
 
     Parameters
     ----------
-    y : NDVar, optional
+    y
         Data to plot ([case,] time, source[, space]).
         If ``y`` has a case dimension, the mean is plotted.
         If ``y`` has a space dimension, the norm is plotted.
@@ -60,25 +60,25 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        y : NDVar, optional
+        y
             Data to plot ([case,] time, source[, space]).
             If ``y`` has a case dimension, the mean is plotted.
             If ``y`` has a space dimension, the norm is plotted.
             If None, uses MNE sample data for demonstration.
-        region : str, optional
+        region
             Brain region to load using aparc+aseg parcellation.
             If None, loads all regions. Only used when y is None.
-        cmap : str | list, optional
+        cmap
             Plotly colorscale for heatmaps. Can be:
             - Built-in colorscale name (e.g., 'Hot', 'Viridis', 'YlOrRd')
             - Custom colorscale list (e.g., [[0, 'yellow'], [1, 'red']])
             Default is 'Hot'. See https://plotly.com/python/builtin-colorscales/
             for all available built-in colorscales.
-        show_max_only : bool, optional
+        show_max_only
             If True, butterfly plot shows only mean and max traces.
             If False, butterfly plot shows individual source traces, mean, and max.
             Default is False.
-        arrow_threshold : float | str, optional
+        arrow_threshold
             Threshold for displaying arrows in brain projections. Only arrows with
             magnitude greater than this value will be displayed. If None, all arrows
             are shown. If 'auto', uses 10% of the maximum magnitude as threshold.
@@ -122,7 +122,7 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        region : str, optional
+        region
             Brain region to load using aparc+aseg parcellation.
             If None, loads all regions.
         """
@@ -164,7 +164,7 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        y : NDVar
+        y
             Data with dimensions ([case,] time, source[, space]).
         """
         if y.has_case:
@@ -844,18 +844,18 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        port : int, optional
+        port
             Port number for the server. If None, uses random port.
-        debug : bool, optional
+        debug
             Enable debug mode. Default is True.
-        mode : str, optional
+        mode
             Display mode. Options:
             - 'external': Open in separate browser window (default)
             - 'inline': Embed directly in Jupyter notebook (modern Dash)
             - 'jupyterlab': Open in JupyterLab tab (modern Dash)
-        width : int, optional
+        width
             Display width in pixels for Jupyter integration. Default is 1200.
-        height : int, optional
+        height
             Display height in pixels for Jupyter integration. Default is 900.
         """
         if port is None:
@@ -887,11 +887,11 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        width : int, optional
+        width
             Display width in pixels. Default is 1200.
-        height : int, optional
+        height
             Display height in pixels. Default is 900.
-        debug : bool, optional
+        debug
             Enable debug mode. Default is False for cleaner output.
 
         Examples
@@ -920,11 +920,11 @@ class EelbrainPlotly2DViz:
 
         Parameters
         ----------
-        output_dir : str, optional
+        output_dir
             Directory to save image files. Default is "./images".
-        time_idx : int, optional
+        time_idx
             Time index to export. If None, uses 0.
-        format : str, optional
+        format
             Image format ('png', 'jpg', 'svg', 'pdf'). Default is 'png'.
 
         Returns
