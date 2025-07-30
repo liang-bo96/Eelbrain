@@ -573,7 +573,6 @@ class EelbrainPlotly2DViz:
                 u_vectors = active_vectors[:, 0]  # X components
                 v_vectors = active_vectors[:, 1]  # Y components
             title = None
-            xlabel, ylabel = 'X (m)', 'Y (m)'
         elif view_name == 'sagittal':  # X view (Y vs Z)
             x_coords = active_coords[:, 1]
             y_coords = active_coords[:, 2]
@@ -581,7 +580,6 @@ class EelbrainPlotly2DViz:
                 u_vectors = active_vectors[:, 1]  # Y components
                 v_vectors = active_vectors[:, 2]  # Z components
             title = None
-            xlabel, ylabel = 'Y (m)', 'Z (m)'
         elif view_name == 'coronal':  # Y view (X vs Z)
             x_coords = active_coords[:, 0]
             y_coords = active_coords[:, 2]
@@ -589,7 +587,6 @@ class EelbrainPlotly2DViz:
                 u_vectors = active_vectors[:, 0]  # X components
                 v_vectors = active_vectors[:, 2]  # Z components
             title = None
-            xlabel, ylabel = 'X (m)', 'Z (m)'
 
         if len(active_coords) > 0:
             # Create data-driven grid using unique coordinate values
@@ -647,7 +644,7 @@ class EelbrainPlotly2DViz:
                 showscale=show_colorbar,
                 zmin=zmin,
                 zmax=zmax,
-                hovertemplate=f'{xlabel}: %{{x:.3f}}<br>{ylabel}: %{{y:.3f}}<br>Activity: %{{z:.2e}}<extra></extra>'
+                hovertemplate='Activity: %{z:.2e}<extra></extra>'
             ))
 
             # Update layout to have white background
@@ -717,7 +714,7 @@ class EelbrainPlotly2DViz:
                         marker=dict(size=12, color='cyan', symbol='circle-open', line=dict(width=3)),
                         name='Selected Source',
                         showlegend=False,
-                        hovertemplate=f'SELECTED SOURCE<br>{xlabel}: %{{x:.3f}}<br>{ylabel}: %{{y:.3f}}<extra></extra>'
+                        hovertemplate='SELECTED SOURCE<extra></extra>'
                     ))
 
                     # Highlight selected source arrow if vectors available
@@ -758,9 +755,9 @@ class EelbrainPlotly2DViz:
 
         fig.update_layout(
             title=title,
-            xaxis_title=xlabel,
-            yaxis_title=ylabel,
-            xaxis=dict(scaleanchor="y", scaleratio=1),  # Equal aspect ratio
+            xaxis=dict(scaleanchor="y", scaleratio=1, showticklabels=False, title=""),
+            # Equal aspect ratio, hide labels
+            yaxis=dict(showticklabels=False, title=""),  # Hide labels
             height=height,
             margin=margin,
             showlegend=False
