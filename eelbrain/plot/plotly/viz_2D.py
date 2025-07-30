@@ -693,27 +693,17 @@ class EelbrainPlotly2DViz:
                             arrow_magnitudes[i] > arrow_magnitudes[position_to_max_idx[pos_key]]):
                         position_to_max_idx[pos_key] = i
 
-                # Now draw only the maximum magnitude arrow for each position
-                for max_idx in position_to_max_idx.values():
-                    x_start = x_coords[max_idx]
-                    y_start = y_coords[max_idx]
-                    x_end = x_start + u_vectors[max_idx] * arrow_scale
-                    y_end = y_start + v_vectors[max_idx] * arrow_scale
+                # OPTIMIZED BATCH ARROW RENDERING
+                if position_to_max_idx:
+                    # Extract arrow data for selected sources
+                    selected_indices = list(position_to_max_idx.values())
+                    arrow_x = x_coords[selected_indices]
+                    arrow_y = y_coords[selected_indices]
+                    arrow_u = u_vectors[selected_indices]
+                    arrow_v = v_vectors[selected_indices]
 
-                    # Add arrow annotation
-                    fig.add_annotation(
-                        x=x_end, y=y_end,
-                        ax=x_start, ay=y_start,
-                        xref='x', yref='y',
-                        axref='x', ayref='y',
-                        showarrow=True,
-                        arrowhead=2,
-                        arrowsize=0.8,
-                        arrowwidth=1,
-                        arrowcolor='black',
-                        text="",
-                        opacity=0.6
-                    )
+                    # Create all arrows as 2 traces instead of 179+ individual annotations
+                    self._create_batch_arrows(fig, arrow_x, arrow_y, arrow_u, arrow_v, arrow_scale)
 
             # Highlight selected source if provided
             if selected_source is not None and selected_source in active_indices:
@@ -749,19 +739,10 @@ class EelbrainPlotly2DViz:
                             x_end = x_start + u_vectors[pos] * arrow_scale
                             y_end = y_start + v_vectors[pos] * arrow_scale
 
-                            # Add highlighted arrow for selected source
-                            fig.add_annotation(
-                                x=x_end, y=y_end,
-                                ax=x_start, ay=y_start,
-                                xref='x', yref='y',
-                                axref='x', ayref='y',
-                                showarrow=True,
-                                arrowhead=3,
-                                arrowsize=1.0,
-                                arrowwidth=2,
-                                arrowcolor='cyan',
-                                text=""
-                            )
+                            # Add highlighted arrow for selected source (optimized)
+                            self._create_batch_arrows(fig, np.array([x_start]), np.array([y_start]),
+                                                      np.array([u_vectors[pos]]), np.array([v_vectors[pos]]),
+                                                      arrow_scale, color='cyan', width=2, size=1.0)
         else:
             # Add annotation if no active sources
             fig.add_annotation(text=f"No active sources for {view_name} view",
@@ -786,6 +767,60 @@ class EelbrainPlotly2DViz:
         )
 
         return fig
+
+    def _create_batch_arrows(self, fig: go.Figure, x_coords: np.ndarray, y_coords: np.ndarray,
+                             u_vectors: np.ndarray, v_vectors: np.ndarray, arrow_scale: float,
+                             color: str = 'black', width: int = 1, size: float = 0.8) -> None:
+        """Create all arrows using batch method."""
+
+        if len(x_coords) == 0:
+            return
+
+        # Calculate all endpoints at once (vectorized)
+        x_ends = x_coords + u_vectors * arrow_scale
+        y_ends = y_coords + v_vectors * arrow_scale
+
+        # Create all arrow lines as a single trace
+        # Use None to separate individual line segments
+        x_lines = []
+        y_lines = []
+        for i in range(len(x_coords)):
+            x_lines.extend([x_coords[i], x_ends[i], None])
+            y_lines.extend([y_coords[i], y_ends[i], None])
+
+        # Add all arrow lines as single trace (instead of 179+ individual annotations)
+        fig.add_trace(go.Scatter(
+            x=x_lines,
+            y=y_lines,
+            mode='lines',
+            line=dict(color=color, width=width),
+            opacity=0.6,
+            showlegend=False,
+            hoverinfo='skip',
+            name='arrow_lines'
+        ))
+
+        # Calculate arrow angles for proper arrowhead rotation
+        angles = np.degrees(np.arctan2(v_vectors, u_vectors))
+        magnitudes = np.sqrt(u_vectors ** 2 + v_vectors ** 2)
+
+        # Add all arrowheads as single trace (instead of 179+ individual annotations)
+        fig.add_trace(go.Scatter(
+            x=x_ends,
+            y=y_ends,
+            mode='markers',
+            marker=dict(
+                symbol='triangle-right',
+                size=6 * size,  # Scale the marker size
+                color=color,
+                opacity=0.8,
+                angle=angles  # Rotate markers to match vector direction
+            ),
+            showlegend=False,
+            hovertemplate='Vector magnitude: %{customdata:.3f}<extra></extra>',
+            customdata=magnitudes,
+            name='arrow_heads'
+        ))
 
     def _fig_to_base64(self, fig: plt.Figure) -> str:
         """Convert matplotlib figure to base64 string for Dash display."""
