@@ -914,7 +914,7 @@ class EelbrainPlotly2DViz:
                             else:
                                 threshold_value = float(self.arrow_threshold)
                             show_selected_arrow = (
-                                    selected_arrow_magnitude > threshold_value
+                                selected_arrow_magnitude > threshold_value
                             )
 
                         if show_selected_arrow:
@@ -1297,4 +1297,3 @@ if __name__ == "__main__":
         import traceback
 
         traceback.print_exc()
-        
