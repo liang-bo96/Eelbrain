@@ -401,8 +401,7 @@ class EelbrainPlotly2DViz:
                     and 0 <= time_idx < len(self.time_values)
             ):
                 time_val = self.time_values[time_idx]
-                status_text = f"Brain views updated for time: {
-                time_val:.3f}s (index {time_idx})"
+                status_text = f"Brain views updated for time: {time_val:.3f}s (index {time_idx})"
                 status_style = {
                     "textAlign": "center",
                     "padding": "10px",
@@ -435,8 +434,7 @@ class EelbrainPlotly2DViz:
                     and 0 <= time_idx < len(self.time_values)
             ):
                 info.append(
-                    f"Time: {
-                    self.time_values[time_idx]:.3f} s (index {time_idx})"
+                    f"Time: {self.time_values[time_idx]:.3f} s (index {time_idx})"
                 )
 
             if (
@@ -447,10 +445,7 @@ class EelbrainPlotly2DViz:
                 coord = self.source_coords[source_idx]
                 info.append(f"Selected source: {source_idx}")
                 info.append(
-                    f"Coordinates: ({
-                    coord[0]:.3f}, {
-                    coord[1]:.3f}, {
-                    coord[2]:.3f}) m"
+                    f"Coordinates: ({coord[0]:.3f}, {coord[1]:.3f}, {coord[2]:.3f}) m"
                 )
 
             result = (
@@ -1223,9 +1218,7 @@ class EelbrainPlotly2DViz:
                 exported_files[f"{view_name}_view"] = brain_path
 
             print(
-                f"✓ Successfully exported {
-                len(exported_files)} image files to {output_dir}"
-            )
+                f"✓ Successfully exported {len(exported_files)} image files to {output_dir}")
             for file_type, path in exported_files.items():
                 print(f"  - {file_type}: {path}")
 
