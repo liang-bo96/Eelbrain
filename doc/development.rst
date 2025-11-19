@@ -71,10 +71,10 @@ if you get a corresponding error, run ``$ ./fix-bin pytest`` from the
 
 
 Contributor Guide
-=================
+-----------------
 
 Why a Contributor Guide is Necessary
--------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A contributor guide is a critical document for any open-source software project, particularly in a scientific context like Eelbrain.
 Its primary purpose is to standardize the development process and lower the barrier to entry for new contributors.
@@ -86,7 +86,7 @@ By removing ambiguity and providing clear instructions, a contributor guide empo
 
 
 Coding Conventions
-------------------
+^^^^^^^^^^^^^^^^^^
 
 To maintain a consistent and readable codebase, we adhere to the following conventions, which were established and refined through code review discussions.
 
@@ -146,7 +146,7 @@ To maintain a consistent and readable codebase, we adhere to the following conve
 
 
 Architecture and Dependency Guidelines
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To keep contributions sustainable and reviews effective, follow these project-level guidelines:
 
@@ -156,7 +156,7 @@ To keep contributions sustainable and reviews effective, follow these project-le
 
 
 The Pull Request (PR) Workflow
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We use a pull request-based workflow for all contributions.
 
@@ -179,7 +179,7 @@ We use a pull request-based workflow for all contributions.
 
 
 Testing and Validation
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Eelbrain relies on a robust test suite to ensure the correctness and reliability of its scientific algorithms.
 
@@ -213,7 +213,7 @@ Eelbrain relies on a robust test suite to ensure the correctness and reliability
 
 
 Code Review Process
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 The code review process is a collaborative effort to improve the quality of the codebase.
 
@@ -252,7 +252,7 @@ The code review process is a collaborative effort to improve the quality of the 
 
 
 Scientific Software Requirements
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As a scientific computing library, Eelbrain has additional requirements beyond typical software projects:
 
