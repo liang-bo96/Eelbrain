@@ -181,7 +181,7 @@ We use a pull request-based workflow for all contributions.
 Testing and Validation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Eelbrain relies on a robust test suite to ensure the correctness and reliability of its scientific algorithms.
+Eelbrain relies on a test suite to ensure the correctness and reliability.
 
 **Automated Testing**
   All pull requests trigger a Continuous Integration (CI) workflow that automatically runs the full test suite.
