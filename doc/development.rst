@@ -97,7 +97,7 @@ To maintain a consistent and readable codebase, we adhere to the following conve
   - Functions that handle data should, where possible, accept data directly as a parameter (e.g., a ``y`` parameter for an ``NDVar``), analogous to existing plotting functions.
 
 **Type Hinting**
-  Use type hints in all function signatures (e.g., ``def my_function(y: NDVar) -> Figure:``).
+  Use type hints in all function signatures (e.g., ``def my_function(y: NDVar) -> Figure:``), see the `Python type hinting documentation <https://docs.python.org/3/library/typing.html>`_.
   When type hints are present in the signature, they should be omitted from the docstring to avoid redundancy.
 
 **Docstrings**
