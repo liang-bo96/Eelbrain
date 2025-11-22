@@ -141,8 +141,7 @@ We use a pull request-based workflow for all contributions. For more information
 
 2. **Make your changes**: Make your code changes, ensuring you follow the coding conventions.
 
-3. **Submit a Pull Request**: When your changes are ready, push your branch to your fork and open a pull request against the ``main`` branch of the official Eelbrain repository.
-
+3. **Submit a Pull Request**: When your changes are ready, push your branch to your fork and open a pull request against the ``main`` branch of the official Eelbrain repository. We recommend opening the pull request in *draft* mode until all CI tests have completed successfully.
    - Use `draft mode <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests>`_ until CI passes.
    - Provide a clear and descriptive title for your PR.
    - In the description, explain the purpose of your changes and link to any relevant GitHub issues.
