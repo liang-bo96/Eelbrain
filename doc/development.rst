@@ -88,7 +88,7 @@ By removing ambiguity and providing clear instructions, a contributor guide empo
 Coding Conventions
 ^^^^^^^^^^^^^^^^^^
 
-To maintain a consistent and readable codebase, we adhere to the following conventions, which were established and refined through code review discussions.
+To maintain a consistent and readable codebase, we adhere to the following conventions:
 
 **Style Guide**
   All Python code must adhere to the `PEP 8 style guide <https://peps.python.org/pep-0008/>`_.
