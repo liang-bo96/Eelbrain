@@ -73,18 +73,6 @@ if you get a corresponding error, run ``$ ./fix-bin pytest`` from the
 Contributor Guide
 -----------------
 
-Why a Contributor Guide is Necessary
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A contributor guide is a critical document for any open-source software project, particularly in a scientific context like Eelbrain.
-Its primary purpose is to standardize the development process and lower the barrier to entry for new contributors.
-For a project to thrive and grow, it must be able to attract and effectively integrate new developers, who may range from students to researchers at other institutions.
-
-A well-written guide provides a clear roadmap for everything from setting up a development environment and running tests to following coding conventions and submitting code for review.
-This standardization ensures that all contributions maintain a consistent level of quality, making the codebase more coherent and easier to manage in the long term.
-By removing ambiguity and providing clear instructions, a contributor guide empowers potential collaborators, reduces the burden on core developers to answer repetitive questions, and fosters a welcoming and productive community.
-
-
 Coding Conventions
 ^^^^^^^^^^^^^^^^^^
 
