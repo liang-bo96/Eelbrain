@@ -90,17 +90,11 @@ To maintain a consistent and readable codebase, we adhere to the following conve
   2. Related third-party imports (e.g., ``numpy``, ``matplotlib``)
   3. Local application/library specific imports (e.g., ``from eelbrain import ...``)
 
-  *Case Study:* In one review, a contributor was reminded to reorder their imports to place standard library modules before third-party and local imports.
-  Following this guideline makes it easier to see the dependencies of a module at a glance.
-
 **API Consistency**
   To make the library intuitive, we strive for consistency across the API:
 
   - Parameter names should be consistent with existing functions. For example, use ``cmap`` for colormaps, not ``colorscale``.
   - Functions that handle data should, where possible, accept data directly as a parameter (e.g., a ``y`` parameter for an ``NDVar``), analogous to existing plotting functions.
-
-  *Case Study:* During the development of the interactive plotting feature, a reviewer noted that a new function used the parameter name ``colorscale``.
-  The contributor was asked to rename it to ``cmap`` to match the parameter name used for colormaps throughout the rest of the Eelbrain library.
 
 **Type Hinting**
   Use type hints in all function signatures (e.g., ``def my_function(y: NDVar) -> Figure:``).
@@ -110,16 +104,10 @@ To maintain a consistent and readable codebase, we adhere to the following conve
   All public functions and classes should have clear and informative docstrings.
   Documentation for a class's ``__init__`` method should be included in the main class docstring.
 
-**Data Access**
-  When working with ``NDVar`` objects, use the ``.get_data()`` method to ensure the data axes are in the desired order, as the internal order is not guaranteed.
-
-**TODOs**
-  For in-code reminders, use a ``TODO:`` tag. For more significant or non-localized tasks, please open a GitHub issue instead.
-
 **Development Tools**
   To streamline the development process and maintain code quality:
 
-  - Use ``flake8`` locally to check code compliance before submitting
+  - Use ``flake8`` locally to check code compliance before submitting (run ``$ flake8 eelbrain`` from the project root)
   - Consider using ``autopep8`` to automatically fix common style issues
   - Configure your IDE to automatically handle formatting (e.g., PyCharm can manage whitespace issues automatically)
   - Run local checks to catch style problems before they appear in CI
@@ -138,15 +126,16 @@ Architecture and Dependency Guidelines
 
 To keep contributions sustainable and reviews effective, follow these project-level guidelines:
 
-- **Reduce complexity via modular boundaries**: keep the Eelbrain core unchanged when possible; place specialized visualization or UI features in separate packages.
-- **Isolate dependencies**: avoid mixing incompatible stacks (e.g., Plotly vs. Matplotlib) within one module; separate packages prevent CI failures and version conflicts.
-- **Prefer smaller, focused units**: submit smaller repositories/modules and small PRs to simplify review, testing, and independent evolution.
+- **Avoid public API changes**: Changes to the public API should be avoided when possible to maintain backward compatibility.
+- **Modularization**: Encourage modular design; place specialized visualization or UI features in separate packages when appropriate.
+- **Isolate dependencies**: Avoid mixing incompatible stacks (e.g., Plotly vs. Matplotlib) within one module; separate packages prevent CI failures and version conflicts.
+- **Prefer smaller, focused units**: Submit smaller repositories/modules and small PRs to simplify review, testing, and independent evolution.
 
 
 The Pull Request (PR) Workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We use a pull request-based workflow for all contributions.
+We use a pull request-based workflow for all contributions. For more information on the GitHub pull request workflow, see `GitHub's documentation <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests>`_.
 
 1. **Create a branch**: Create a new branch from ``main`` for your feature or bugfix.
 
@@ -154,6 +143,7 @@ We use a pull request-based workflow for all contributions.
 
 3. **Submit a Pull Request**: When your changes are ready, push your branch to your fork and open a pull request against the ``main`` branch of the official Eelbrain repository.
 
+   - Use `draft mode <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests>`_ until CI passes.
    - Provide a clear and descriptive title for your PR.
    - In the description, explain the purpose of your changes and link to any relevant GitHub issues.
 
@@ -163,7 +153,7 @@ We use a pull request-based workflow for all contributions.
    Reviewers noted that this made the review process very challenging.
    This experience highlighted the importance of smaller, more focused PRs to facilitate timely and effective feedback.
 
-5. **Address feedback**: Engage with the code review process by responding to comments and pushing new commits to your branch to address the feedback.
+5. **Address feedback**: Engage with the code review process by responding to comments and pushing new commits to your branch to address the feedback. When you've addressed all comments and are ready for re-review, leave a comment on the PR to notify the reviewers.
 
 
 Testing and Validation
@@ -182,14 +172,6 @@ Eelbrain relies on a test suite to ensure the correctness and reliability.
 **Writing New Tests**
   Any new feature or bugfix should be accompanied by corresponding unit tests.
   This helps prevent future regressions and validates that your code is working as expected.
-
-**Integration Testing**
-  For new modules (especially those with external dependencies like Plotly), ensure they:
-
-  - Are compatible with the Jupyter notebook environment
-  - Do not conflict with existing dependencies (particularly Matplotlib)
-  - Work across supported platforms (Linux, Windows 10+, macOS)
-  - Meet scientific visualization quality standards for accuracy and reproducibility
 
 **Performance Considerations**
   When implementing interactive features:
