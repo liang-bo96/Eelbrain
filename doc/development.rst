@@ -108,7 +108,8 @@ if you get a corresponding error, run ``$ ./fix-bin pytest`` from the
 ``Eelbrain`` repository root.
 
 **Validation Workflow**
-    1. **Run tests locally first**: Start with ``make test`` and confirm it passes on your machine.
+    1. **Run tests locally first**: Start with ``make test`` and confirm it passes on your machine. 
+       See the [pytest docs](https://docs.pytest.org/en/stable/how-to/usage.html) on how to run individual tests when working on a specific fix. 
     2. **CI Automation**: All pull requests trigger a Continuous Integration (CI) workflow that automatically runs the full test suite. CI blocks merges when tests fail.
 
 
