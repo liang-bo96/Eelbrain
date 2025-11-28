@@ -59,6 +59,10 @@ Bug reports and feature requests are welcome on the `GitHub Issue Tracker <https
     - **Traceback**: The complete error traceback text.
     - **Description**: A clear description of the expected behavior versus the actual behavior.
 
+**Bug fixes**
+    If you notice a bug and are able to fix it, we welcome a pull request.
+    Ideally, include a test to preempt future regressions (see :ref:`dev-testing`).
+
 **Feature Requests**
     If you plan to implement a new feature, please **open an issue first** to discuss the design. This keeps efforts aligned with the roadmap and reduces the chance of duplicate work.
 
