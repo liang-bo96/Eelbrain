@@ -59,14 +59,19 @@ Bug reports and feature requests are welcome on the `GitHub Issue Tracker <https
     - **Traceback**: The complete error traceback text.
     - **Description**: A clear description of the expected behavior versus the actual behavior.
 
+**Bug fixes**
+    If you notice a bug and are able to fix it, we welcome a pull request.
+    Ideally, include a test to preempt future regressions (see :ref:`dev-testing`).
+
 **Feature Requests**
-    If you plan to implement a new feature, please **open an issue first** to discuss the design. This keeps efforts aligned with the roadmap and reduces the chance of duplicate work.
+    If you are thinking about implementing a new feature, please **open an issue first** to discuss the design. This keeps efforts aligned with the roadmap and reduces the chance of duplicate work.
 
 Pull Request Workflow
 ^^^^^^^^^^^^^^^^^^^^^
 
 We follow a standard Git workflow. For more details, see `GitHub's Pull Request documentation <https://docs.github.com/en/pull-requests>`_.
 
+0. **Create a Fork** of [Eelbrain](https://github.com/Eelbrain/Eelbrain).
 1. **Create a Branch**: Create a new branch from ``main`` for each feature or fix.
 2. **Commit Changes**: Make your changes and commit them.
 3. **Open a Pull Request (PR)**:
@@ -91,6 +96,8 @@ The code review process is a collaborative effort to improve code quality.
     2. **Leave a comment** on the PR (e.g., "Ready for re-review") or re-request a review via the GitHub UI. This explicitly notifies the maintainers that you are ready for the next round.
 
 
+.. _dev-testing:
+
 Testing and Validation
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -102,7 +109,8 @@ if you get a corresponding error, run ``$ ./fix-bin pytest`` from the
 ``Eelbrain`` repository root.
 
 **Validation Workflow**
-    1. **Run tests locally first**: Start with ``make test`` and confirm it passes on your machine.
+    1. **Run tests locally first**: Start with ``make test`` and confirm it passes on your machine. 
+       See the [pytest docs](https://docs.pytest.org/en/stable/how-to/usage.html) on how to run individual tests when working on a specific fix. 
     2. **CI Automation**: All pull requests trigger a Continuous Integration (CI) workflow that automatically runs the full test suite. CI blocks merges when tests fail.
 
 
@@ -126,6 +134,7 @@ Coding Style and Documentation
 **Type Hinting**
     We use type hints in all function signatures (e.g., ``def my_function(y: NDVar) -> Figure:``).
     There's no need to duplicate type information in docstrings if it is already present in the signature; the signature is the source of truth.
+    For more information see :mod:`typing`.
 
 **Docstrings**
     - We follow the `numpydoc style <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_ for all docstrings.
