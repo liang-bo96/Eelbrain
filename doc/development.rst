@@ -133,6 +133,7 @@ Coding Style and Documentation
 **Type Hinting**
     We use type hints in all function signatures (e.g., ``def my_function(y: NDVar) -> Figure:``).
     There's no need to duplicate type information in docstrings if it is already present in the signature; the signature is the source of truth.
+    For more information see :mod:`typing`.
 
 **Docstrings**
     - We follow the `numpydoc style <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_ for all docstrings.
