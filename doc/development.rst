@@ -86,6 +86,7 @@ The code review process is a collaborative effort to improve code quality.
 
 **Responding to Feedback**
     When you have addressed all reviewer comments:
+
     1. Push the new commits to your branch.
     2. **Leave a comment** on the PR (e.g., "Ready for re-review") or re-request a review via the GitHub UI. This explicitly notifies the maintainers that you are ready for the next round.
 
