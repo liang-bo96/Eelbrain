@@ -71,6 +71,7 @@ Pull Request Workflow
 
 We follow a standard Git workflow. For more details, see `GitHub's Pull Request documentation <https://docs.github.com/en/pull-requests>`_.
 
+0. **Create a Fork** of [Eelbrain](https://github.com/Eelbrain/Eelbrain).
 1. **Create a Branch**: Create a new branch from ``main`` for each feature or fix.
 2. **Commit Changes**: Make your changes and commit them.
 3. **Open a Pull Request (PR)**:
