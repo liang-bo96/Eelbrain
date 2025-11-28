@@ -64,7 +64,7 @@ Bug reports and feature requests are welcome on the `GitHub Issue Tracker <https
     Ideally, include a test to preempt future regressions (see :ref:`dev-testing`).
 
 **Feature Requests**
-    If you plan to implement a new feature, please **open an issue first** to discuss the design. This keeps efforts aligned with the roadmap and reduces the chance of duplicate work.
+    If you are thinking about implementing a new feature, please **open an issue first** to discuss the design. This keeps efforts aligned with the roadmap and reduces the chance of duplicate work.
 
 Pull Request Workflow
 ^^^^^^^^^^^^^^^^^^^^^
