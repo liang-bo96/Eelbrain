@@ -74,11 +74,12 @@ We follow a standard Git workflow. For more details, see `GitHub's Pull Request 
 0. **Create a Fork** of [Eelbrain](https://github.com/Eelbrain/Eelbrain).
 1. **Create a Branch**: Create a new branch from ``main`` for each feature or fix.
 2. **Commit Changes**: Make your changes and commit them.
-3. **Open a Pull Request (PR)**:
-    - **Use Draft Mode**: Draft mode keeps work-in-progress safe from accidental merges and invites early feedback on your approach.
+3. **Test Locally**: Run the relevant tests (e.g., ``make test`` or targeted ``pytest`` invocations) before opening a pull request.
+4. **Open a Pull Request (PR)**:
+    - **Use Draft Mode**: Draft mode keeps work-in-progress safe from accidental merges and invites early feedback on your approach. See `GitHub's guide on draft pull requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests>`_.
     - **Ready for Review**: Switch the PR status to "Ready for Review" when the implementation is complete and local tests pass.
     - Link to any relevant issues or discussions in the PR description.
-4. **Keep PRs Small**: Small, focused PRs are easier to review and merge.
+5. **Keep PRs Small**: Small, focused PRs are easier to review and merge.
 
 
 Code Review Process
@@ -169,3 +170,4 @@ While not required, the following tools are used by the maintainers and can stre
 
 - **SourceTree**: A graphical frontend for git (`link <https://www.sourcetreeapp.com>`_).
 - **PyCharm**: A powerful Python IDE that can handle formatting and testing (`link <https://www.jetbrains.com/pycharm>`_).
+- **VS Code**: A lightweight, extensible editor with rich Python tooling support (`link <https://code.visualstudio.com>`_).
