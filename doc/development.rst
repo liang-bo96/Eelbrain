@@ -6,6 +6,10 @@ Development
 
 Eelbrain is hosted on `GitHub <https://github.com/Eelbrain/Eelbrain>`_.
 
+.. contents:: Table of Contents
+   :depth: 2
+   :local:
+
 
 The Development Version
 -----------------------
@@ -69,7 +73,7 @@ Bug reports and feature requests are welcome on the `GitHub Issue Tracker <https
 Pull Request Workflow
 ^^^^^^^^^^^^^^^^^^^^^
 
-We follow a standard Git workflow. For more details, see `GitHub's Pull Request documentation <https://docs.github.com/en/pull-requests>`_.
+We follow a standard Git workflow. For more details, see `GitHub's Pull Request documentation <https://docs.github.com/en/pull-requests>`_. Keep pull requests small and focused for faster reviews and easier merges; the steps below outline the recommended workflow.
 
 0. **Create a Fork** of [Eelbrain](https://github.com/Eelbrain/Eelbrain).
 1. **Create a Branch**: Create a new branch from ``main`` for each feature or fix.
@@ -79,7 +83,6 @@ We follow a standard Git workflow. For more details, see `GitHub's Pull Request 
     - **Use Draft Mode**: Draft mode keeps work-in-progress safe from accidental merges and invites early feedback on your approach. See `GitHub's guide on draft pull requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests>`_.
     - **Ready for Review**: Switch the PR status to "Ready for Review" when the implementation is complete and local tests pass.
     - Link to any relevant issues or discussions in the PR description.
-5. **Keep PRs Small**: Small, focused PRs are easier to review and merge.
 
 
 Code Review Process
