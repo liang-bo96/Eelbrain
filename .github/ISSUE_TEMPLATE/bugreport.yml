@@ -1,0 +1,74 @@
+name: "Bug report"
+description: "Report a reproducible issue with Eelbrain"
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug. Please include a minimal reproducible example and key details so we can triage quickly.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "What went wrong? Briefly describe the issue."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproducible example
+      description: "A short, self-contained snippet or steps that trigger the bug."
+      placeholder: |
+        ```python
+        import eelbrain
+        # minimal code that triggers the issue
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: "List the exact steps to reproduce the issue."
+      placeholder: |
+        1. …
+        2. …
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: "What did you expect to happen?"
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: "What actually happened? Include full error messages or tracebacks."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Eelbrain version
+      description: "Output of `import eelbrain; print(eelbrain.__version__)`."
+      placeholder: "dev / 0.xx.x / commit hash"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and Python
+      description: "OS and Python version (e.g., macOS 14.4, Python 3.10.12)."
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Additional context
+      description: "Logs, screenshots, or anything else that might help."
