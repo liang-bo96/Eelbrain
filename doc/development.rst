@@ -1,14 +1,11 @@
 .. _development:
+.. _contributing:
 
-***********
-Development
-***********
+************
+Contributing
+************
 
 Eelbrain is hosted on `GitHub <https://github.com/Eelbrain/Eelbrain>`_.
-
-.. contents:: Table of Contents
-   :depth: 2
-   :local:
 
 
 The Development Version
@@ -45,13 +42,8 @@ In Python, you can make sure that you are working with the development version::
     'dev'
 
 
-Contributor Guide
------------------
-
-This guide acts as the single entry point for contributors. It starts with how to report or propose changes and then covers testing expectations and the conventions we follow for code and documentation.
-
 Opening Issues
-^^^^^^^^^^^^^^
+--------------
 
 Bug reports and feature requests are welcome on the `GitHub Issue Tracker <https://github.com/Eelbrain/Eelbrain/issues>`_. If you're unsure whether something is a bug or an enhancement, feel free to ask in an issue.
 
@@ -71,7 +63,7 @@ Bug reports and feature requests are welcome on the `GitHub Issue Tracker <https
     If you are thinking about implementing a new feature, please **open an issue first** to discuss the design. This keeps efforts aligned with the roadmap and reduces the chance of duplicate work.
 
 Pull Request Workflow
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 We follow a standard Git workflow. For more details, see `GitHub's Pull Request documentation <https://docs.github.com/en/pull-requests>`_. Keep pull requests small and focused for faster reviews and easier merges; the steps below outline the recommended workflow.
 
@@ -86,7 +78,7 @@ We follow a standard Git workflow. For more details, see `GitHub's Pull Request 
 
 
 Code Review Process
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 The code review process is a collaborative effort to improve code quality.
 
@@ -103,7 +95,7 @@ The code review process is a collaborative effort to improve code quality.
 .. _dev-testing:
 
 Testing and Validation
-^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 Tests for individual modules are included in folders called ``tests``, usually
 on the same level as the module.
@@ -113,13 +105,13 @@ if you get a corresponding error, run ``$ ./fix-bin pytest`` from the
 ``Eelbrain`` repository root.
 
 **Validation Workflow**
-    1. **Run tests locally first**: Start with ``make test`` and confirm it passes on your machine. 
-       See the [pytest docs](https://docs.pytest.org/en/stable/how-to/usage.html) on how to run individual tests when working on a specific fix. 
+    1. **Run tests locally first**: Start with ``make test`` and confirm it passes on your machine.
+       See the [pytest docs](https://docs.pytest.org/en/stable/how-to/usage.html) on how to run individual tests when working on a specific fix.
     2. **CI Automation**: All pull requests trigger a Continuous Integration (CI) workflow that automatically runs the full test suite. CI blocks merges when tests fail.
 
 
 Coding Style and Documentation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 
 **PEP 8 Style and Formatting**
     To facilitate maintenance and consistent reviews, we follow the `PEP 8 style guide <https://peps.python.org/pep-0008/>`_.
@@ -149,7 +141,7 @@ Coding Style and Documentation
 
 
 Scientific Software Requirements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------
 
 As a scientific computing library, Eelbrain aims to protect data integrity:
 
@@ -167,7 +159,7 @@ As a scientific computing library, Eelbrain aims to protect data integrity:
 
 
 Recommended Tools
-^^^^^^^^^^^^^^^^^
+-----------------
 
 While not required, the following tools are used by the maintainers and can streamline development:
 
