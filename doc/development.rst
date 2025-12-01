@@ -7,6 +7,12 @@ Contributing
 
 Eelbrain is hosted on `GitHub <https://github.com/Eelbrain/Eelbrain>`_.
 
+Welcome to the Eelbrain Contributor's Guide! This page is a gentle introduction to contributing: it explains how to get involved, propose changes, and meet our expectations for testing, style, and documentation. We're growing this guide to be useful for all contributors—if you spot gaps or have suggestions, please let us know through the issue tracker.
+
+.. contents:: Table of Contents
+   :depth: 2
+   :local:
+
 
 The Development Version
 -----------------------
