@@ -83,6 +83,16 @@ We follow a standard Git workflow. For more details, see `GitHub's Pull Request 
     - Link to any relevant issues or discussions in the PR description.
 
 
+Git Best Practices
+------------------
+
+- **Thoughtful commits and PRs**: Group related changes together; avoid bundling unrelated work. Keep PRs small and coherent. Non-trivial PRs should receive at least two reviews, and even if permissions allow it, do not merge your own PRs.
+- **Clear commit messages**: Write meaningful subjects that describe what changed and why (e.g., ``Website: Fix typos in homepage text``; ``README.md: Add link to Well-Understood paper``). Avoid vague messages like "Fix stuff" or "Update". Ensure the message matches the actual changes.
+- **Credit co-authors**: When multiple people contribute to a commit, append ``Co-Authored-By: Name <email>`` for each contributor at the end of the commit message.
+- **Syncing with main**: Rebase onto ``main`` regularly to keep a clean history (avoid merge commits where possible). Rebase when conflicts arise or when upstream changes affect stable artifacts (e.g., ``stable/``) to prevent CI failures.
+- **Squashing**: For long or noisy histories that iterate on the same code, squash related commits into concise units before merging. Aim for commits that each represent a coherent change rather than a series of incremental fixes to the same feature.
+
+
 Code Review Process
 -------------------
 
